@@ -1,5 +1,5 @@
 Generated 86 entries; 104 problem records
-PASS: 86 entries, 104 problems, 446 local links; deterministic generation
+PASS: 86 entries, 104 problems, 453 local links; deterministic generation
 
 {
   "compiler": "g++.EXE (x86_64-mcf-seh-rev0, Built by MinGW-Builds project) 15.2.0",

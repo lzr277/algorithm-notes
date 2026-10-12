@@ -62,10 +62,13 @@ def build():
         write(OUT/'章节'/(chapter+'.md'),f'# {chapter[3:]}（补充）\n\n[返回项目首页](../../README.md)\n\n'+ '\n'.join(toc)+'\n\n'+'\n'.join(entries))
         contents.append((chapter,entries)); chapters.append(f'- [{chapter[3:]}](章节/{chapter}.md)：{len(entries)} 个补充专题')
     # 单文件总手册的原文片段路径与章节相差一级。
-    all_text='# 算法学习手册\n\n'+ '\n'.join(chapters)+'\n\n'
+    all_text='# 算法学习手册\n\n[项目首页](../README.md) · [题目索引](题目索引.md) · [完整程序](代码/README.md) · [来源与修正](来源与修正.md) · [验证报告](验证报告.md)\n\n'+ '\n'.join(chapters)+'\n\n'
+    all_text+='- [清单专有题目补充](#appendix)：15个补充题目说明\n\n'
     all_text += '\n'.join(f'- [{x["title"]}](#{x["anchor"]})' for x in manifest)+'\n\n'
     for chapter,entries in contents:
         all_text+=f'# {chapter[3:]}\n\n'+'\n'.join(entries).replace('(../原文片段/','(原文片段/')
+    appendix=OUT/'清单专有题目补充.md'
+    if appendix.exists(): all_text+='\n<a id="appendix"></a>\n\n'+appendix.read_text(encoding='utf-8')
     write(OUT/'算法学习手册.md',all_text)
     write(ROOT/'manifest.json',json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
     z=zipfile.ZipFile(ROOT/'原始资料'/'基础课题目.docx')
