@@ -1,0 +1,33 @@
+若p是质数，则对于任意整数 1 <= m <= n，有：
+    C(n, m) = C(n % p, m % p) * C(n / p, m / p) (mod p)
+
+int qmi(int a, int k)       // 快速幂模板
+{
+    int res = 1;
+    while (k)
+    {
+        if (k & 1) res = (LL)res * a % p;
+        a = (LL)a * a % p;
+        k >>= 1;
+    }
+    return res;
+}
+
+
+int C(int a, int b)     // 通过定理求组合数C(a, b)
+{
+    int res = 1;
+    for (int i = 1, j = a; i <= b; i ++, j -- )
+    {
+        res = (LL)res * j % p;
+        res = (LL)res * qmi(i, p - 2) % p;
+    }
+    return res;
+}
+
+
+int lucas(LL a, LL b)
+{
+    if (a < p && b < p) return C(a, b);
+    return (LL)C(a % p, b % p) * lucas(a / p, b / p) % p;
+}

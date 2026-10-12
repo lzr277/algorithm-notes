@@ -1,0 +1,926 @@
+[
+  {
+    "chapter": "01-基础算法",
+    "title": "快速排序算法模板",
+    "anchor": "01-01",
+    "source": "第一章基础算法.txt",
+    "line": 2,
+    "ids": [
+      "785"
+    ],
+    "fragment": "算法学习手册/原文片段/01-基础算法/01-01-快速排序算法模板.txt"
+  },
+  {
+    "chapter": "01-基础算法",
+    "title": "归并排序算法模板",
+    "anchor": "01-02",
+    "source": "第一章基础算法.txt",
+    "line": 17,
+    "ids": [
+      "787"
+    ],
+    "fragment": "算法学习手册/原文片段/01-基础算法/01-02-归并排序算法模板.txt"
+  },
+  {
+    "chapter": "01-基础算法",
+    "title": "整数二分算法模板",
+    "anchor": "01-03",
+    "source": "第一章基础算法.txt",
+    "line": 36,
+    "ids": [
+      "789"
+    ],
+    "fragment": "算法学习手册/原文片段/01-基础算法/01-03-整数二分算法模板.txt"
+  },
+  {
+    "chapter": "01-基础算法",
+    "title": "浮点数二分算法模板",
+    "anchor": "01-04",
+    "source": "第一章基础算法.txt",
+    "line": 61,
+    "ids": [
+      "790"
+    ],
+    "fragment": "算法学习手册/原文片段/01-基础算法/01-04-浮点数二分算法模板.txt"
+  },
+  {
+    "chapter": "01-基础算法",
+    "title": "高精度加法",
+    "anchor": "01-05",
+    "source": "第一章基础算法.txt",
+    "line": 75,
+    "ids": [
+      "791"
+    ],
+    "fragment": "算法学习手册/原文片段/01-基础算法/01-05-高精度加法.txt"
+  },
+  {
+    "chapter": "01-基础算法",
+    "title": "高精度减法",
+    "anchor": "01-06",
+    "source": "第一章基础算法.txt",
+    "line": 94,
+    "ids": [
+      "792"
+    ],
+    "fragment": "算法学习手册/原文片段/01-基础算法/01-06-高精度减法.txt"
+  },
+  {
+    "chapter": "01-基础算法",
+    "title": "高精度乘低精度",
+    "anchor": "01-07",
+    "source": "第一章基础算法.txt",
+    "line": 111,
+    "ids": [
+      "793"
+    ],
+    "fragment": "算法学习手册/原文片段/01-基础算法/01-07-高精度乘低精度.txt"
+  },
+  {
+    "chapter": "01-基础算法",
+    "title": "高精度除以低精度",
+    "anchor": "01-08",
+    "source": "第一章基础算法.txt",
+    "line": 126,
+    "ids": [
+      "794"
+    ],
+    "fragment": "算法学习手册/原文片段/01-基础算法/01-08-高精度除以低精度.txt"
+  },
+  {
+    "chapter": "01-基础算法",
+    "title": "一维前缀和",
+    "anchor": "01-09",
+    "source": "第一章基础算法.txt",
+    "line": 142,
+    "ids": [
+      "795"
+    ],
+    "fragment": "算法学习手册/原文片段/01-基础算法/01-09-一维前缀和.txt"
+  },
+  {
+    "chapter": "01-基础算法",
+    "title": "二维前缀和",
+    "anchor": "01-10",
+    "source": "第一章基础算法.txt",
+    "line": 145,
+    "ids": [
+      "796"
+    ],
+    "fragment": "算法学习手册/原文片段/01-基础算法/01-10-二维前缀和.txt"
+  },
+  {
+    "chapter": "01-基础算法",
+    "title": "一维差分",
+    "anchor": "01-11",
+    "source": "第一章基础算法.txt",
+    "line": 149,
+    "ids": [
+      "797"
+    ],
+    "fragment": "算法学习手册/原文片段/01-基础算法/01-11-一维差分.txt"
+  },
+  {
+    "chapter": "01-基础算法",
+    "title": "二维差分",
+    "anchor": "01-12",
+    "source": "第一章基础算法.txt",
+    "line": 151,
+    "ids": [
+      "798"
+    ],
+    "fragment": "算法学习手册/原文片段/01-基础算法/01-12-二维差分.txt"
+  },
+  {
+    "chapter": "01-基础算法",
+    "title": "位运算",
+    "anchor": "01-13",
+    "source": "第一章基础算法.txt",
+    "line": 154,
+    "ids": [
+      "801"
+    ],
+    "fragment": "算法学习手册/原文片段/01-基础算法/01-13-位运算.txt"
+  },
+  {
+    "chapter": "01-基础算法",
+    "title": "双指针算法",
+    "anchor": "01-14",
+    "source": "第一章基础算法.txt",
+    "line": 157,
+    "ids": [
+      "799",
+      "800"
+    ],
+    "fragment": "算法学习手册/原文片段/01-基础算法/01-14-双指针算法.txt"
+  },
+  {
+    "chapter": "01-基础算法",
+    "title": "离散化",
+    "anchor": "01-15",
+    "source": "第一章基础算法.txt",
+    "line": 167,
+    "ids": [
+      "802"
+    ],
+    "fragment": "算法学习手册/原文片段/01-基础算法/01-15-离散化.txt"
+  },
+  {
+    "chapter": "01-基础算法",
+    "title": "区间合并",
+    "anchor": "01-16",
+    "source": "第一章基础算法.txt",
+    "line": 184,
+    "ids": [
+      "803"
+    ],
+    "fragment": "算法学习手册/原文片段/01-基础算法/01-16-区间合并.txt"
+  },
+  {
+    "chapter": "02-数据结构",
+    "title": "单链表",
+    "anchor": "02-01",
+    "source": "第二章.txt",
+    "line": 1,
+    "ids": [
+      "826"
+    ],
+    "fragment": "算法学习手册/原文片段/02-数据结构/02-01-单链表.txt"
+  },
+  {
+    "chapter": "02-数据结构",
+    "title": "双链表",
+    "anchor": "02-02",
+    "source": "第二章.txt",
+    "line": 23,
+    "ids": [
+      "827"
+    ],
+    "fragment": "算法学习手册/原文片段/02-数据结构/02-02-双链表.txt"
+  },
+  {
+    "chapter": "02-数据结构",
+    "title": "栈",
+    "anchor": "02-03",
+    "source": "第二章.txt",
+    "line": 49,
+    "ids": [
+      "828"
+    ],
+    "fragment": "算法学习手册/原文片段/02-数据结构/02-03-栈.txt"
+  },
+  {
+    "chapter": "02-数据结构",
+    "title": "队列",
+    "anchor": "02-04",
+    "source": "第二章.txt",
+    "line": 67,
+    "ids": [
+      "829"
+    ],
+    "fragment": "算法学习手册/原文片段/02-数据结构/02-04-队列.txt"
+  },
+  {
+    "chapter": "02-数据结构",
+    "title": "单调栈",
+    "anchor": "02-05",
+    "source": "第二章.txt",
+    "line": 106,
+    "ids": [
+      "830"
+    ],
+    "fragment": "算法学习手册/原文片段/02-数据结构/02-05-单调栈.txt"
+  },
+  {
+    "chapter": "02-数据结构",
+    "title": "单调队列",
+    "anchor": "02-06",
+    "source": "第二章.txt",
+    "line": 114,
+    "ids": [
+      "154"
+    ],
+    "fragment": "算法学习手册/原文片段/02-数据结构/02-06-单调队列.txt"
+  },
+  {
+    "chapter": "02-数据结构",
+    "title": "KMP",
+    "anchor": "02-07",
+    "source": "第二章.txt",
+    "line": 123,
+    "ids": [
+      "831"
+    ],
+    "fragment": "算法学习手册/原文片段/02-数据结构/02-07-KMP.txt"
+  },
+  {
+    "chapter": "02-数据结构",
+    "title": "Trie树",
+    "anchor": "02-08",
+    "source": "第二章.txt",
+    "line": 144,
+    "ids": [
+      "835"
+    ],
+    "fragment": "算法学习手册/原文片段/02-数据结构/02-08-Trie树.txt"
+  },
+  {
+    "chapter": "02-数据结构",
+    "title": "并查集",
+    "anchor": "02-09",
+    "source": "第二章.txt",
+    "line": 175,
+    "ids": [
+      "836",
+      "837"
+    ],
+    "fragment": "算法学习手册/原文片段/02-数据结构/02-09-并查集.txt"
+  },
+  {
+    "chapter": "02-数据结构",
+    "title": "堆",
+    "anchor": "02-10",
+    "source": "第二章.txt",
+    "line": 245,
+    "ids": [
+      "838",
+      "839"
+    ],
+    "fragment": "算法学习手册/原文片段/02-数据结构/02-10-堆.txt"
+  },
+  {
+    "chapter": "02-数据结构",
+    "title": "一般哈希",
+    "anchor": "02-11",
+    "source": "第二章.txt",
+    "line": 282,
+    "ids": [
+      "840"
+    ],
+    "fragment": "算法学习手册/原文片段/02-数据结构/02-11-一般哈希.txt"
+  },
+  {
+    "chapter": "02-数据结构",
+    "title": "字符串哈希",
+    "anchor": "02-12",
+    "source": "第二章.txt",
+    "line": 320,
+    "ids": [
+      "841"
+    ],
+    "fragment": "算法学习手册/原文片段/02-数据结构/02-12-字符串哈希.txt"
+  },
+  {
+    "chapter": "02-数据结构",
+    "title": "C++ STL简介",
+    "anchor": "02-13",
+    "source": "第二章.txt",
+    "line": 340,
+    "ids": [],
+    "fragment": "算法学习手册/原文片段/02-数据结构/02-13-C++ STL简介.txt"
+  },
+  {
+    "chapter": "03-搜索与图论",
+    "title": "树与图的存储",
+    "anchor": "03-01",
+    "source": "第三章.txt",
+    "line": 1,
+    "ids": [],
+    "fragment": "算法学习手册/原文片段/03-搜索与图论/03-01-树与图的存储.txt"
+  },
+  {
+    "chapter": "03-搜索与图论",
+    "title": "树与图的遍历",
+    "anchor": "03-02",
+    "source": "第三章.txt",
+    "line": 22,
+    "ids": [],
+    "fragment": "算法学习手册/原文片段/03-搜索与图论/03-02-树与图的遍历.txt"
+  },
+  {
+    "chapter": "03-搜索与图论",
+    "title": "深度优先遍历",
+    "anchor": "03-03",
+    "source": "第三章.txt",
+    "line": 24,
+    "ids": [
+      "846"
+    ],
+    "fragment": "算法学习手册/原文片段/03-搜索与图论/03-03-深度优先遍历.txt"
+  },
+  {
+    "chapter": "03-搜索与图论",
+    "title": "宽度优先遍历",
+    "anchor": "03-04",
+    "source": "第三章.txt",
+    "line": 36,
+    "ids": [
+      "847"
+    ],
+    "fragment": "算法学习手册/原文片段/03-搜索与图论/03-04-宽度优先遍历.txt"
+  },
+  {
+    "chapter": "03-搜索与图论",
+    "title": "拓扑排序",
+    "anchor": "03-05",
+    "source": "第三章.txt",
+    "line": 57,
+    "ids": [
+      "848"
+    ],
+    "fragment": "算法学习手册/原文片段/03-搜索与图论/03-05-拓扑排序.txt"
+  },
+  {
+    "chapter": "03-搜索与图论",
+    "title": "朴素dijkstra算法",
+    "anchor": "03-06",
+    "source": "第三章.txt",
+    "line": 83,
+    "ids": [
+      "849"
+    ],
+    "fragment": "算法学习手册/原文片段/03-搜索与图论/03-06-朴素dijkstra算法.txt"
+  },
+  {
+    "chapter": "03-搜索与图论",
+    "title": "堆优化版dijkstra",
+    "anchor": "03-07",
+    "source": "第三章.txt",
+    "line": 112,
+    "ids": [
+      "850"
+    ],
+    "fragment": "算法学习手册/原文片段/03-搜索与图论/03-07-堆优化版dijkstra.txt"
+  },
+  {
+    "chapter": "03-搜索与图论",
+    "title": "Bellman-Ford算法",
+    "anchor": "03-08",
+    "source": "第三章.txt",
+    "line": 153,
+    "ids": [
+      "853"
+    ],
+    "fragment": "算法学习手册/原文片段/03-搜索与图论/03-08-Bellman-Ford算法.txt"
+  },
+  {
+    "chapter": "03-搜索与图论",
+    "title": "spfa 算法（队列优化的Bellman-Ford算法）",
+    "anchor": "03-09",
+    "source": "第三章.txt",
+    "line": 185,
+    "ids": [
+      "851"
+    ],
+    "fragment": "算法学习手册/原文片段/03-搜索与图论/03-09-spfa 算法（队列优化的Bellman-Ford算法）.txt"
+  },
+  {
+    "chapter": "03-搜索与图论",
+    "title": "spfa判断图中是否存在负环",
+    "anchor": "03-10",
+    "source": "第三章.txt",
+    "line": 227,
+    "ids": [
+      "852"
+    ],
+    "fragment": "算法学习手册/原文片段/03-搜索与图论/03-10-spfa判断图中是否存在负环.txt"
+  },
+  {
+    "chapter": "03-搜索与图论",
+    "title": "floyd算法",
+    "anchor": "03-11",
+    "source": "第三章.txt",
+    "line": 273,
+    "ids": [
+      "854"
+    ],
+    "fragment": "算法学习手册/原文片段/03-搜索与图论/03-11-floyd算法.txt"
+  },
+  {
+    "chapter": "03-搜索与图论",
+    "title": "朴素版prim算法",
+    "anchor": "03-12",
+    "source": "第三章.txt",
+    "line": 289,
+    "ids": [
+      "858"
+    ],
+    "fragment": "算法学习手册/原文片段/03-搜索与图论/03-12-朴素版prim算法.txt"
+  },
+  {
+    "chapter": "03-搜索与图论",
+    "title": "Kruskal算法",
+    "anchor": "03-13",
+    "source": "第三章.txt",
+    "line": 320,
+    "ids": [
+      "859"
+    ],
+    "fragment": "算法学习手册/原文片段/03-搜索与图论/03-13-Kruskal算法.txt"
+  },
+  {
+    "chapter": "03-搜索与图论",
+    "title": "染色法判别二分图",
+    "anchor": "03-14",
+    "source": "第三章.txt",
+    "line": 364,
+    "ids": [
+      "860"
+    ],
+    "fragment": "算法学习手册/原文片段/03-搜索与图论/03-14-染色法判别二分图.txt"
+  },
+  {
+    "chapter": "03-搜索与图论",
+    "title": "匈牙利算法",
+    "anchor": "03-15",
+    "source": "第三章.txt",
+    "line": 400,
+    "ids": [
+      "861"
+    ],
+    "fragment": "算法学习手册/原文片段/03-搜索与图论/03-15-匈牙利算法.txt"
+  },
+  {
+    "chapter": "04-数学知识",
+    "title": "试除法判定质数",
+    "anchor": "04-01",
+    "source": "第四章.txt",
+    "line": 1,
+    "ids": [
+      "866"
+    ],
+    "fragment": "算法学习手册/原文片段/04-数学知识/04-01-试除法判定质数.txt"
+  },
+  {
+    "chapter": "04-数学知识",
+    "title": "试除法分解质因数",
+    "anchor": "04-02",
+    "source": "第四章.txt",
+    "line": 10,
+    "ids": [
+      "867"
+    ],
+    "fragment": "算法学习手册/原文片段/04-数学知识/04-02-试除法分解质因数.txt"
+  },
+  {
+    "chapter": "04-数学知识",
+    "title": "朴素筛法求素数",
+    "anchor": "04-03",
+    "source": "第四章.txt",
+    "line": 23,
+    "ids": [
+      "868"
+    ],
+    "fragment": "算法学习手册/原文片段/04-数学知识/04-03-朴素筛法求素数.txt"
+  },
+  {
+    "chapter": "04-数学知识",
+    "title": "线性筛法求素数",
+    "anchor": "04-04",
+    "source": "第四章.txt",
+    "line": 37,
+    "ids": [
+      "868"
+    ],
+    "fragment": "算法学习手册/原文片段/04-数学知识/04-04-线性筛法求素数.txt"
+  },
+  {
+    "chapter": "04-数学知识",
+    "title": "试除法求所有约数",
+    "anchor": "04-05",
+    "source": "第四章.txt",
+    "line": 53,
+    "ids": [
+      "869"
+    ],
+    "fragment": "算法学习手册/原文片段/04-数学知识/04-05-试除法求所有约数.txt"
+  },
+  {
+    "chapter": "04-数学知识",
+    "title": "约数个数和约数之和",
+    "anchor": "04-06",
+    "source": "第四章.txt",
+    "line": 66,
+    "ids": [
+      "870",
+      "871"
+    ],
+    "fragment": "算法学习手册/原文片段/04-数学知识/04-06-约数个数和约数之和.txt"
+  },
+  {
+    "chapter": "04-数学知识",
+    "title": "欧几里得算法",
+    "anchor": "04-07",
+    "source": "第四章.txt",
+    "line": 70,
+    "ids": [
+      "872"
+    ],
+    "fragment": "算法学习手册/原文片段/04-数学知识/04-07-欧几里得算法.txt"
+  },
+  {
+    "chapter": "04-数学知识",
+    "title": "求欧拉函数",
+    "anchor": "04-08",
+    "source": "第四章.txt",
+    "line": 75,
+    "ids": [
+      "873"
+    ],
+    "fragment": "算法学习手册/原文片段/04-数学知识/04-08-求欧拉函数.txt"
+  },
+  {
+    "chapter": "04-数学知识",
+    "title": "筛法求欧拉函数",
+    "anchor": "04-09",
+    "source": "第四章.txt",
+    "line": 89,
+    "ids": [
+      "874"
+    ],
+    "fragment": "算法学习手册/原文片段/04-数学知识/04-09-筛法求欧拉函数.txt"
+  },
+  {
+    "chapter": "04-数学知识",
+    "title": "快速幂",
+    "anchor": "04-10",
+    "source": "第四章.txt",
+    "line": 118,
+    "ids": [
+      "875"
+    ],
+    "fragment": "算法学习手册/原文片段/04-数学知识/04-10-快速幂.txt"
+  },
+  {
+    "chapter": "04-数学知识",
+    "title": "扩展欧几里得算法",
+    "anchor": "04-11",
+    "source": "第四章.txt",
+    "line": 132,
+    "ids": [
+      "877"
+    ],
+    "fragment": "算法学习手册/原文片段/04-数学知识/04-11-扩展欧几里得算法.txt"
+  },
+  {
+    "chapter": "04-数学知识",
+    "title": "高斯消元",
+    "anchor": "04-12",
+    "source": "第四章.txt",
+    "line": 145,
+    "ids": [
+      "883"
+    ],
+    "fragment": "算法学习手册/原文片段/04-数学知识/04-12-高斯消元.txt"
+  },
+  {
+    "chapter": "04-数学知识",
+    "title": "递归法求组合数",
+    "anchor": "04-13",
+    "source": "第四章.txt",
+    "line": 183,
+    "ids": [
+      "885"
+    ],
+    "fragment": "算法学习手册/原文片段/04-数学知识/04-13-递归法求组合数.txt"
+  },
+  {
+    "chapter": "04-数学知识",
+    "title": "通过预处理逆元的方式求组合数",
+    "anchor": "04-14",
+    "source": "第四章.txt",
+    "line": 189,
+    "ids": [
+      "886"
+    ],
+    "fragment": "算法学习手册/原文片段/04-数学知识/04-14-通过预处理逆元的方式求组合数.txt"
+  },
+  {
+    "chapter": "04-数学知识",
+    "title": "Lucas定理",
+    "anchor": "04-15",
+    "source": "第四章.txt",
+    "line": 211,
+    "ids": [
+      "887"
+    ],
+    "fragment": "算法学习手册/原文片段/04-数学知识/04-15-Lucas定理.txt"
+  },
+  {
+    "chapter": "04-数学知识",
+    "title": "分解质因数法求组合数",
+    "anchor": "04-16",
+    "source": "第四章.txt",
+    "line": 245,
+    "ids": [
+      "888"
+    ],
+    "fragment": "算法学习手册/原文片段/04-数学知识/04-16-分解质因数法求组合数.txt"
+  },
+  {
+    "chapter": "04-数学知识",
+    "title": "卡特兰数",
+    "anchor": "04-17",
+    "source": "第四章.txt",
+    "line": 317,
+    "ids": [
+      "889"
+    ],
+    "fragment": "算法学习手册/原文片段/04-数学知识/04-17-卡特兰数.txt"
+  },
+  {
+    "chapter": "04-数学知识",
+    "title": "NIM游戏",
+    "anchor": "04-18",
+    "source": "第四章.txt",
+    "line": 319,
+    "ids": [
+      "891"
+    ],
+    "fragment": "算法学习手册/原文片段/04-数学知识/04-18-NIM游戏.txt"
+  },
+  {
+    "chapter": "04-数学知识",
+    "title": "有向图游戏的和",
+    "anchor": "04-19",
+    "source": "第四章.txt",
+    "line": 350,
+    "ids": [
+      "893"
+    ],
+    "fragment": "算法学习手册/原文片段/04-数学知识/04-19-有向图游戏的和.txt"
+  },
+  {
+    "chapter": "05-动态规划",
+    "title": "01背包",
+    "anchor": "05-01",
+    "source": "基础课题目.docx",
+    "ids": [
+      "2"
+    ],
+    "supplement": true
+  },
+  {
+    "chapter": "05-动态规划",
+    "title": "完全背包",
+    "anchor": "05-02",
+    "source": "基础课题目.docx",
+    "ids": [
+      "3"
+    ],
+    "supplement": true
+  },
+  {
+    "chapter": "05-动态规划",
+    "title": "多重背包",
+    "anchor": "05-03",
+    "source": "基础课题目.docx",
+    "ids": [
+      "4",
+      "5"
+    ],
+    "supplement": true
+  },
+  {
+    "chapter": "05-动态规划",
+    "title": "分组背包",
+    "anchor": "05-04",
+    "source": "基础课题目.docx",
+    "ids": [
+      "9"
+    ],
+    "supplement": true
+  },
+  {
+    "chapter": "05-动态规划",
+    "title": "数字三角形",
+    "anchor": "05-05",
+    "source": "基础课题目.docx",
+    "ids": [
+      "898"
+    ],
+    "supplement": true
+  },
+  {
+    "chapter": "05-动态规划",
+    "title": "最长上升子序列",
+    "anchor": "05-06",
+    "source": "基础课题目.docx",
+    "ids": [
+      "895",
+      "896"
+    ],
+    "supplement": true
+  },
+  {
+    "chapter": "05-动态规划",
+    "title": "最长公共子序列",
+    "anchor": "05-07",
+    "source": "基础课题目.docx",
+    "ids": [
+      "897"
+    ],
+    "supplement": true
+  },
+  {
+    "chapter": "05-动态规划",
+    "title": "编辑距离与多次查询",
+    "anchor": "05-08",
+    "source": "基础课题目.docx",
+    "ids": [
+      "902",
+      "899"
+    ],
+    "supplement": true
+  },
+  {
+    "chapter": "05-动态规划",
+    "title": "石子合并",
+    "anchor": "05-09",
+    "source": "基础课题目.docx",
+    "ids": [
+      "282"
+    ],
+    "supplement": true
+  },
+  {
+    "chapter": "05-动态规划",
+    "title": "整数划分",
+    "anchor": "05-10",
+    "source": "基础课题目.docx",
+    "ids": [
+      "900"
+    ],
+    "supplement": true
+  },
+  {
+    "chapter": "05-动态规划",
+    "title": "数位统计",
+    "anchor": "05-11",
+    "source": "基础课题目.docx",
+    "ids": [
+      "338"
+    ],
+    "supplement": true
+  },
+  {
+    "chapter": "05-动态规划",
+    "title": "蒙德里安的梦想",
+    "anchor": "05-12",
+    "source": "基础课题目.docx",
+    "ids": [
+      "291"
+    ],
+    "supplement": true
+  },
+  {
+    "chapter": "05-动态规划",
+    "title": "最短Hamilton路径",
+    "anchor": "05-13",
+    "source": "基础课题目.docx",
+    "ids": [
+      "91"
+    ],
+    "supplement": true
+  },
+  {
+    "chapter": "05-动态规划",
+    "title": "没有上司的舞会",
+    "anchor": "05-14",
+    "source": "基础课题目.docx",
+    "ids": [
+      "285"
+    ],
+    "supplement": true
+  },
+  {
+    "chapter": "05-动态规划",
+    "title": "滑雪",
+    "anchor": "05-15",
+    "source": "基础课题目.docx",
+    "ids": [
+      "901"
+    ],
+    "supplement": true
+  },
+  {
+    "chapter": "06-贪心",
+    "title": "区间选点",
+    "anchor": "06-01",
+    "source": "基础课题目.docx",
+    "ids": [
+      "905"
+    ],
+    "supplement": true
+  },
+  {
+    "chapter": "06-贪心",
+    "title": "最大不相交区间",
+    "anchor": "06-02",
+    "source": "基础课题目.docx",
+    "ids": [
+      "908"
+    ],
+    "supplement": true
+  },
+  {
+    "chapter": "06-贪心",
+    "title": "区间分组",
+    "anchor": "06-03",
+    "source": "基础课题目.docx",
+    "ids": [
+      "906"
+    ],
+    "supplement": true
+  },
+  {
+    "chapter": "06-贪心",
+    "title": "区间覆盖",
+    "anchor": "06-04",
+    "source": "基础课题目.docx",
+    "ids": [
+      "907"
+    ],
+    "supplement": true
+  },
+  {
+    "chapter": "06-贪心",
+    "title": "Huffman合并",
+    "anchor": "06-05",
+    "source": "基础课题目.docx",
+    "ids": [
+      "148"
+    ],
+    "supplement": true
+  },
+  {
+    "chapter": "06-贪心",
+    "title": "排队打水",
+    "anchor": "06-06",
+    "source": "基础课题目.docx",
+    "ids": [
+      "913"
+    ],
+    "supplement": true
+  },
+  {
+    "chapter": "06-贪心",
+    "title": "货仓选址",
+    "anchor": "06-07",
+    "source": "基础课题目.docx",
+    "ids": [
+      "104"
+    ],
+    "supplement": true
+  },
+  {
+    "chapter": "06-贪心",
+    "title": "耍杂技的牛",
+    "anchor": "06-08",
+    "source": "基础课题目.docx",
+    "ids": [
+      "125"
+    ],
+    "supplement": true
+  }
+]

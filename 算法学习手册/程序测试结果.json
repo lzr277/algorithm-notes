@@ -1,0 +1,18 @@
+{
+  "compiler": "g++.EXE (x86_64-mcf-seh-rev0, Built by MinGW-Builds project) 15.2.0",
+  "standard": "C++17",
+  "seed": 20261012,
+  "programs": {
+    "002": 50,
+    "785": 56,
+    "789": 50,
+    "836": 31,
+    "847": 42,
+    "875": 104,
+    "895": 50,
+    "905": 41
+  },
+  "total_cases": 424,
+  "result": "PASS",
+  "online_judge": "not run"
+}
