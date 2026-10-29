@@ -63,6 +63,7 @@ def build():
         contents.append((chapter,entries)); chapters.append(f'- [{chapter[3:]}](章节/{chapter}.md)：{len(entries)} 个补充专题')
     # 单文件总手册的原文片段路径与章节相差一级。
     all_text='# 算法学习手册\n\n[项目首页](../README.md) · [题目索引](题目索引.md) · [完整程序](代码/README.md) · [来源与修正](来源与修正.md) · [验证报告](验证报告.md)\n\n'+ '\n'.join(chapters)+'\n\n'
+    all_text+='- [常见排序方法](常见排序方法.md)：九种排序的原理、模板与竞赛选型\n\n'
     all_text+='- [清单专有题目补充](#appendix)：15个补充题目说明\n\n'
     all_text += '\n'.join(f'- [{x["title"]}](#{x["anchor"]})' for x in manifest)+'\n\n'
     for chapter,entries in contents:

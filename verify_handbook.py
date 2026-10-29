@@ -18,6 +18,8 @@ def check():
     checked=0
     for p in ROOT.rglob('*.md'):
         text=p.read_text(encoding='utf-8')
+        # C++ lambda 的 ](...) 不是 Markdown 链接；跳过围栏代码块。
+        text=re.sub(r'^```[^\n]*\n.*?^```\s*$', '', text, flags=re.M|re.S)
         for link in re.findall(r'\]\(([^)]+)\)',text):
             if link.startswith(('http:','https:','mailto:')):continue
             target,_,anchor=link.partition('#')
