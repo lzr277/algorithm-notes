@@ -14,3 +14,5 @@
 维护动画版：修改学习手册后，在章节目录运行 `python render_handbook.py`（需 `pip install markdown`）；脚本保留原有动画并更新正文和目录。
 
 代码约定：统一使用 `bits/stdc++.h`、`#define int long long`、`signed main()`，大括号单独换行。此处的 `int` 会由宏展开为 `long long`；函数片段放在同样的头文件与宏定义之后使用。
+
+- [带括号的递归解析笔记](01-递推与递归/带括号的递归解析.md)：全局下标、父层跳过右括号、完整代码与逐层模拟。总手册开头已有章节目录。
