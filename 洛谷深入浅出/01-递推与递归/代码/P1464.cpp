@@ -1,24 +1,49 @@
-#include <iostream>
+#include <bits/stdc++.h>
+#define int long long
 using namespace std;
-long long memo[21][21][21]{};
-bool seen[21][21][21]{};
-long long w(long long a,long long b,long long c) {
-    if(a<=0 || b<=0 || c<=0) return 1;
-    if(a>20 || b>20 || c>20) return w(20,20,20);
-    if(seen[a][b][c]) return memo[a][b][c];
-    long long ans;
-    if(a<b && b<c)
-        ans=w(a,b,c-1)+w(a,b-1,c-1)-w(a,b-1,c);
-    else
-        ans=w(a-1,b,c)+w(a-1,b-1,c)+w(a-1,b,c-1)-w(a-1,b-1,c-1);
-    seen[a][b][c]=true;
-    return memo[a][b][c]=ans;
-}
-int main() {
-    ios::sync_with_stdio(false); cin.tie(nullptr);
-    long long a,b,c;
-    while(cin>>a>>b>>c) {
-        if(a==-1 && b==-1 && c==-1) break;
-        cout<<"w("<<a<<", "<<b<<", "<<c<<") = "<<w(a,b,c)<<'\n';
+
+int dp[22][22][22];
+
+int fc(int a,int b,int c)
+{
+    if(a<1||b<1||c<1) return 1;
+
+    if(a>20||b>20||c>20)
+        return fc(20,20,20);
+
+    if(dp[a][b][c]!=-1)
+        return dp[a][b][c];
+
+    if(a<b&&b<c)
+    {
+        dp[a][b][c]=fc(a,b-1,c-1)
+                   +fc(a,b,c-1)
+                   -fc(a,b-1,c);
     }
+    else
+    {
+        dp[a][b][c]=fc(a-1,b,c)
+                   +fc(a-1,b-1,c)
+                   +fc(a-1,b,c-1)
+                   -fc(a-1,b-1,c-1);
+    }
+
+    return dp[a][b][c];
+}
+
+signed main()
+{
+    memset(dp,-1,sizeof dp);
+
+    int a,b,c;
+
+    while(cin>>a>>b>>c)
+    {
+        if(a==-1&&b==-1&&c==-1)
+            break;
+
+        cout<<"w("<<a<<", "<<b<<", "<<c<<") = "<<fc(a,b,c)<<'\n';
+    }
+
+    return 0;
 }

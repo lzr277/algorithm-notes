@@ -12,3 +12,5 @@
 后续学习内容统一放在本目录，完成后提交并推送当前 GitHub 仓库；具体约定见 [AGENTS.md](AGENTS.md)。
 
 维护动画版：修改学习手册后，在章节目录运行 `python render_handbook.py`（需 `pip install markdown`）；脚本保留原有动画并更新正文和目录。
+
+代码约定：统一使用 `bits/stdc++.h`、`#define int long long`、`signed main()`，大括号单独换行。此处的 `int` 会由宏展开为 `long long`；函数片段放在同样的头文件与宏定义之后使用。
