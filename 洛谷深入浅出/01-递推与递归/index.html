@@ -1,35 +1,91 @@
 <!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>递推与递归 · 从零开始</title><style>
 :root{color-scheme:light;--bg:#f4f6fa;--ink:#20304a;--paper:#fff;--blue:#2865cd;--line:#dbe3ee}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.85 system-ui,'Microsoft YaHei',sans-serif}header{background:#162d50;color:#fff;padding:52px max(24px,calc((100vw - 1120px)/2))}header small{color:#a9ccff;letter-spacing:3px}header h1{font-size:clamp(30px,5vw,52px);margin:10px 0}header p{max-width:700px;color:#d5e1f3}main{max-width:1180px;margin:32px auto;padding:0 24px}article{background:var(--paper);padding:clamp(20px,4vw,52px);border-radius:16px}h2{margin-top:48px;border-bottom:2px solid var(--line);padding-bottom:12px;scroll-margin-top:20px}h3{color:var(--blue)}a{color:var(--blue)}pre{overflow:auto;background:#17263d;color:#e2ebfc;padding:22px;border-radius:10px;font:14px/1.7 Consolas,monospace;white-space:pre}code{font-family:Consolas,monospace}p code{background:#ecf2fb;padding:2px 5px;border-radius:4px}nav{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0}nav a{font-size:14px;text-decoration:none;background:#fff;padding:8px 14px;border:1px solid var(--line);border-radius:8px}table{border-collapse:collapse;width:100%;font-size:15px}td,th{padding:12px;border-bottom:1px solid var(--line);text-align:left}.table-wrap{overflow:auto}.lab{padding:28px;background:white;border:1px solid var(--line);border-radius:16px}.lab h2{margin-top:0}.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}button,select{font:inherit;padding:9px 14px;border:1px solid #c7d3e5;border-radius:8px;background:#fff;color:var(--ink);cursor:pointer}button:hover{background:#edf3ff}button:disabled{opacity:.4;cursor:default}#play{background:var(--blue);color:white}.stage{min-height:260px;background:#f5f8fe;border-radius:12px;margin-top:22px;padding:24px;overflow:auto}.cells{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}.cell{background:white;border:2px solid #cbd7eb;border-radius:9px;padding:12px;min-width:65px;text-align:center;transition:transform .3s,background .3s}.cell.active{background:#d8e9ff;border-color:#2865cd;transform:translateY(-7px)}.cell small{display:block;font-size:12px}.cell b{font-size:24px}.grid{display:grid;gap:6px;grid-template-columns:repeat(7,minmax(38px,1fr));max-width:560px}.grid .cell{min-width:0;padding:5px;font-size:14px}.cell.block{background:#ffe2df;border-color:#c8473e}.stack{display:flex;flex-direction:column-reverse;gap:8px;max-width:420px}.stack .cell{text-align:left}.caption{padding:16px 0;min-height:75px;font-weight:600}#counter{font-size:14px;color:#526581}details{margin-top:20px}footer{font-size:14px;padding:32px 0;color:#53647d}@media(prefers-reduced-motion:reduce){*{transition:none!important}}@media print{header,nav,.lab{display:none}body{background:white}main{padding:0}article{padding:0}pre{white-space:pre-wrap}h2{break-after:avoid}}
-</style></head><body><header><small>LUOGU · C++17 · 第一课</small><h1>让大问题，一步步变小。</h1><p>先理解递推、递归、记忆化，再挑战六个经典例题。每次只前进一步，观察答案从哪里来。</p></header><main><section class="lab"><h2>算法放映室</h2><p>先选入门演示，按“下一步”手推；熟悉后再播放。所有演示离线运行，计数值由实际算法生成。</p><div class="controls"><label for="scene">演示</label><select id="scene"><option value="sum">入门① 递推求和</option><option value="fact">入门② 阶乘的调用与返回</option><option value="memo">入门③ 斐波那契记忆化</option><option value="stairs">P1255 数楼梯</option><option value="grid">P1002 过河卒</option><option value="catalan">P1044 栈与卡特兰数</option><option value="number">P1028 数的计算</option><option value="function">P1464 缓存命中</option><option value="decode">P1928 拆套娃</option></select><button id="prev">上一步</button><button id="next">下一步</button><button id="play">自动播放</button><button id="reset">重置</button><span id="counter"></span></div><div id="stage" class="stage" role="img" aria-label="算法当前状态"></div><div id="caption" class="caption" aria-live="polite"></div></section><nav><a href="#s1">先认识三个概念</a><a href="#s2">入门 1：递推——像推倒一排多米诺骨牌</a><a href="#s3">入门 2：递归——把大盒子拆成小盒子</a><a href="#s4">入门 3：同一个斐波那契，三种写法</a><a href="#s5">入门自测：先过这一关</a><a href="#s6">P1255 数楼梯：从最后一步倒推</a><a href="#s7">P1002 过河卒：在棋盘上填表</a><a href="#s8">P1044 栈：把合法操作拆成两段</a><a href="#s9">P1028 数的计算：递归分解与循环实现</a><a href="#s10">P1464 Function：给三个参数建立缓存</a><a href="#s11">P1928 外星密码：每层递归负责一对括号</a><a href="#s12">如何安排学习</a><a href="#s13">来源与范围</a></nav><article><h1>递推与递归：从零开始的 C++ 学习手册</h1><p>先学基础，再做六道例题。默认你会变量、循环、数组和函数；所有程序使用 C++17。动画版与本手册配套，双击同目录的 <code>index.html</code> 即可离线学习。</p><h2 id="s1">先认识三个概念</h2><div class="table-wrap"><table><tr><th>方法</th><th>直观理解</th><th>谁决定先算什么</th><th>常见工具</th></tr><tr><td>递推</td><td>从已知答案，一格一格推出后面的答案</td><td>程序员安排循环顺序</td><td>循环、数组</td></tr><tr><td>递归</td><td>函数把任务交给规模更小的自己，等结果回来再处理</td><td>函数调用关系</td><td>终止条件、调用栈</td></tr><tr><td>记忆化搜索</td><td>递归时带一个答案本，遇到旧问题直接查</td><td>仍由递归按需访问</td><td>递归、缓存数组</td></tr></table></div><p>递推和递归可以计算同一个数学关系。递归是一种程序组织方式；记忆化搜索是在递归搜索中保存状态答案的技巧。判断能不能缓存，要看“同一个状态的答案是否固定”，不能只看函数有没有重复调用。</p><h2 id="s2">入门 1：递推——像推倒一排多米诺骨牌</h2><p>任务：求 1 到 n 的和。定义 s[i] 为前 i 个正整数的和。</p><pre><code>起点 s[0]=0
+</style></head><body><header><small>LUOGU · C++17 · 第一课</small><h1>让大问题，一步步变小。</h1><p>先理解递推、递归、记忆化，再挑战六个经典例题。每次只前进一步，观察答案从哪里来。</p></header><main><section class="lab"><h2>算法放映室</h2><p>先选入门演示，按“下一步”手推；熟悉后再播放。所有演示离线运行，计数值由实际算法生成。</p><div class="controls"><label for="scene">演示</label><select id="scene"><option value="sum">入门① 递推求和</option><option value="fact">入门② 阶乘的调用与返回</option><option value="memo">入门③ 斐波那契记忆化</option><option value="stairs">P1255 数楼梯</option><option value="grid">P1002 过河卒</option><option value="brackets">K07 卡特兰数：五种括号路径</option><option value="catalan">P1044 栈与卡特兰数</option><option value="number">P1028 数的计算</option><option value="function">P1464 缓存命中</option><option value="decode">P1928 拆套娃</option></select><button id="prev">上一步</button><button id="next">下一步</button><button id="play">自动播放</button><button id="reset">重置</button><span id="counter"></span></div><div id="stage" class="stage" role="img" aria-label="算法当前状态"></div><div id="caption" class="caption" aria-live="polite"></div></section><nav><a href="#s1">递推与递归：从零开始的 C++ 学习手册</a><a href="#s2">先认识三个概念</a><a href="#s3">入门 1：递推——像推倒一排多米诺骨牌</a><a href="#s4">入门 2：递归——把大盒子拆成小盒子</a><a href="#s5">入门 3：同一个斐波那契，三种写法</a><a href="#s6">入门自测：先过这一关</a><a href="#s7">知识点全解：先理解，再套题</a><a href="#s8">图片知识点覆盖表</a><a href="#s9">K01 递推思想</a><a href="#s10">K02 递推式与递推式的推导</a><a href="#s11">K03 初始条件与边界条件</a><a href="#s12">K04 斐波那契数列</a><a href="#s13">K05 二维递推</a><a href="#s14">K06 栈与“栈题递推式”的推导</a><a href="#s15">K07 卡特兰数：概念、推导、实现与识别</a><a href="#s16">K08 递归思想与调用栈</a><a href="#s17">K09 分解成子问题</a><a href="#s18">K10 利用递归求解，并改写成递推</a><a href="#s19">K11 递归记忆化（记忆化搜索）</a><a href="#s20">K12 较复杂的递归：嵌套结构与共享游标</a><a href="#s21">知识点综合检查</a><a href="#s22">对照图片：六个经典例题</a><a href="#s23">P1255 数楼梯：从最后一步倒推</a><a href="#s24">P1002 过河卒：在棋盘上填表</a><a href="#s25">P1044 栈：把合法操作拆成两段</a><a href="#s26">P1028 数的计算：递归分解与循环实现</a><a href="#s27">P1464 Function：给三个参数建立缓存</a><a href="#s28">P1928 外星密码：每层递归负责一对括号</a><a href="#s29">如何安排学习</a><a href="#s30">来源与范围</a></nav><article><h1 id="s1">递推与递归：从零开始的 C++ 学习手册</h1>
+<p>先学基础，再做六道例题。默认你会变量、循环、数组和函数；所有程序使用 C++17。动画版与本手册配套，双击同目录的 <code>index.html</code> 即可离线学习。</p>
+<h2 id="s2">先认识三个概念</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>直观理解</th>
+<th>谁决定先算什么</th>
+<th>常见工具</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>递推</td>
+<td>从已知答案，一格一格推出后面的答案</td>
+<td>程序员安排循环顺序</td>
+<td>循环、数组</td>
+</tr>
+<tr>
+<td>递归</td>
+<td>函数把任务交给规模更小的自己，等结果回来再处理</td>
+<td>函数调用关系</td>
+<td>终止条件、调用栈</td>
+</tr>
+<tr>
+<td>记忆化搜索</td>
+<td>递归时带一个答案本，遇到旧问题直接查</td>
+<td>仍由递归按需访问</td>
+<td>递归、缓存数组</td>
+</tr>
+</tbody>
+</table></div>
+<p>递推和递归可以计算同一个数学关系。递归是一种程序组织方式；记忆化搜索是在递归搜索中保存状态答案的技巧。判断能不能缓存，要看“同一个状态的答案是否固定”，不能只看函数有没有重复调用。</p>
+<h2 id="s3">入门 1：递推——像推倒一排多米诺骨牌</h2>
+<p>任务：求 1 到 n 的和。定义 s[i] 为前 i 个正整数的和。</p>
+<pre><code class="language-text">起点 s[0]=0
        +1       +2       +3        +4
    0 ─────→ 1 ─────→ 3 ─────→ 6 ─────→ 10
-</code></pre><p>关系是 <code>s[i]=s[i-1]+i</code>。三个步骤：先定义状态，找出初始条件，再确定计算顺序。循环到 i 时，必须已经知道 s[i-1]。</p><pre><code>#include &lt;iostream&gt;
+</code></pre>
+<p>关系是 <code>s[i]=s[i-1]+i</code>。三个步骤：先定义状态，找出初始条件，再确定计算顺序。循环到 i 时，必须已经知道 s[i-1]。</p>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
 using namespace std;
 int main() {
     int n; cin &gt;&gt; n; // 本例约定 0 &lt;= n &lt;= 1000000
     long long s = 0;
     for (int i = 1; i &lt;= n; ++i) s += i;
-    cout &lt;&lt; s &lt;&lt; &#x27;\n&#x27;;
+    cout &lt;&lt; s &lt;&lt; '\n';
 }
-</code></pre><p>这个版本只保留前一个答案，时间 O(n)，额外空间 O(1)。若要查询所有前缀和，就保存数组。n=0 时循环不执行，答案仍为 0。循环结束的依据是 i 每次增加并最终超过 n。</p><p>试一试： 不运行程序，写出 n=5 时 s 的每次变化。答案：0、1、3、6、10、15。</p><h2 id="s3">入门 2：递归——把大盒子拆成小盒子</h2><p>任务：计算阶乘。<code>n! = n × (n-1)!</code>，并且 <code>0! = 1</code>。把 <code>fact(n)</code> 理解成一个承诺：它会返回 n 的阶乘。</p><pre><code>long long fact(int n) { // 0 &lt;= n &lt;= 20
+</code></pre>
+<p>这个版本只保留前一个答案，时间 O(n)，额外空间 O(1)。若要查询所有前缀和，就保存数组。n=0 时循环不执行，答案仍为 0。循环结束的依据是 i 每次增加并最终超过 n。</p>
+<p><strong>试一试：</strong> 不运行程序，写出 n=5 时 s 的每次变化。答案：0、1、3、6、10、15。</p>
+<h2 id="s4">入门 2：递归——把大盒子拆成小盒子</h2>
+<p>任务：计算阶乘。<code>n! = n × (n-1)!</code>，并且 <code>0! = 1</code>。把 <code>fact(n)</code> 理解成一个承诺：它会返回 n 的阶乘。</p>
+<pre><code class="language-cpp">long long fact(int n) { // 0 &lt;= n &lt;= 20
     if (n == 0) return 1;       // 递归出口
     return n * fact(n - 1);     // 缩小问题，等返回后再乘
 }
-</code></pre><pre><code>向下调用：fact(4) → fact(3) → fact(2) → fact(1) → fact(0)
+</code></pre>
+<pre><code class="language-text">向下调用：fact(4) → fact(3) → fact(2) → fact(1) → fact(0)
 等待的乘法： 4×?       3×?       2×?       1×?        返回1
 向上返回：     24   ←    6   ←    2   ←    1    ←     1
-</code></pre><p>调用 <code>fact(4)</code> 时，4 不会消失。系统在调用栈里记下“还要乘 4”。最深层返回后，一层一层完成这些未做完的工作。这就是“先递下去，再归回来”。动画中观察进入和返回两个方向。</p><p>检查递归的三件事：出口是什么？参数是否越来越接近出口？拿到子问题答案以后怎样组成当前答案？仅有出口不够，<code>fact(n+1)</code> 永远走不到 n=0。负数也不符合本例的输入约定。</p><p>时间 O(n)，调用栈空间 O(n)。递归不会自动省时间或空间；深度很大时可能栈溢出。20! 能放入有符号 long long，21! 就不能。</p><p>试一试： 为什么不能写成 <code>return fact(n);</code>？因为状态没有缩小，函数不断调用自身直到栈耗尽。</p><h2 id="s4">入门 3：同一个斐波那契，三种写法</h2><p>本节约定 <code>F(0)=0, F(1)=1</code>，<code>F(n)=F(n-1)+F(n-2)</code>。这里只用 0≤n≤90，以免 long long 溢出。注意数楼梯的初始值与这里不同。</p><h3>朴素递归：表达直接，但会重复工作</h3><pre><code>long long fib(int n) {
+</code></pre>
+<p>调用 <code>fact(4)</code> 时，4 不会消失。系统在调用栈里记下“还要乘 4”。最深层返回后，一层一层完成这些未做完的工作。这就是“先递下去，再归回来”。动画中观察进入和返回两个方向。</p>
+<p>检查递归的三件事：出口是什么？参数是否越来越接近出口？拿到子问题答案以后怎样组成当前答案？仅有出口不够，<code>fact(n+1)</code> 永远走不到 n=0。负数也不符合本例的输入约定。</p>
+<p>时间 O(n)，调用栈空间 O(n)。递归不会自动省时间或空间；深度很大时可能栈溢出。20! 能放入有符号 long long，21! 就不能。</p>
+<p><strong>试一试：</strong> 为什么不能写成 <code>return fact(n);</code>？因为状态没有缩小，函数不断调用自身直到栈耗尽。</p>
+<h2 id="s5">入门 3：同一个斐波那契，三种写法</h2>
+<p>本节约定 <code>F(0)=0, F(1)=1</code>，<code>F(n)=F(n-1)+F(n-2)</code>。这里只用 0≤n≤90，以免 long long 溢出。注意数楼梯的初始值与这里不同。</p>
+<h3>朴素递归：表达直接，但会重复工作</h3>
+<pre><code class="language-cpp">long long fib(int n) {
     if (n &lt;= 1) return n;
     return fib(n - 1) + fib(n - 2);
 }
-</code></pre><pre><code>                     F(5)
+</code></pre>
+<pre><code class="language-text">                     F(5)
                   /        \
                F(4)        F(3) ← 又算一次
               /    \       /   \
            F(3)   F(2)   F(2)  F(1)
            /  \
         F(2) F(1)   ……相同小问题反复出现
-</code></pre><p>F(5)=5，但函数一共进入 15 次。每次重新展开 F(3)，都会重算相同的子树。时间为指数级（上界 O(2^n)），调用栈深度 O(n)。实际体验请先只试 n≤30，不要直接测试 n=90。</p><h3>记忆化搜索：给每个状态一个抽屉</h3><pre><code>long long memo[91];
+</code></pre>
+<p>F(5)=5，但函数一共进入 15 次。每次重新展开 F(3)，都会重算相同的子树。时间为指数级（上界 O(2^n)），调用栈深度 O(n)。实际体验请先只试 n≤30，不要直接测试 n=90。</p>
+<h3>记忆化搜索：给每个状态一个抽屉</h3>
+<pre><code class="language-cpp">long long memo[91];
 bool seen[91]{};
 long long fibMemo(int n) {
     if (n &lt;= 1) return n;
@@ -38,7 +94,12 @@ long long fibMemo(int n) {
     seen[n] = true;             // 算完后才标记
     return memo[n];
 }
-</code></pre><p>第一次 F(3) 计算完，把 2 放入编号 3 的抽屉；第二次需要 F(3) 时直接取出。缓存的是状态 n 的答案，不是整条调用路径。 对固定问题，n 相同答案就相同，所以能复用。</p><p>用 seen 区分“没算过”和“答案为 0”；不能普遍用 <code>memo[n]!=0</code> 判断已计算。若函数依赖额外条件，缓存键必须包含这些条件。例如网格换了障碍位置，旧答案就应清空或重新建表。存在环的状态关系还需要额外处理，不能直接照搬本模板。</p><p>每个非边界状态只展开一次，每次最多两条转移，因此时间 O(n)，缓存与调用栈合计 O(n)。重复命中缓存仍算函数调用，但不再展开子树。</p><h3>循环递推：按编号主动填表</h3><pre><code>long long fibLoop(int n) {
+</code></pre>
+<p>第一次 F(3) 计算完，把 2 放入编号 3 的抽屉；第二次需要 F(3) 时直接取出。<strong>缓存的是状态 n 的答案，不是整条调用路径。</strong> 对固定问题，n 相同答案就相同，所以能复用。</p>
+<p>用 seen 区分“没算过”和“答案为 0”；不能普遍用 <code>memo[n]!=0</code> 判断已计算。若函数依赖额外条件，缓存键必须包含这些条件。例如网格换了障碍位置，旧答案就应清空或重新建表。存在环的状态关系还需要额外处理，不能直接照搬本模板。</p>
+<p>每个非边界状态只展开一次，每次最多两条转移，因此时间 O(n)，缓存与调用栈合计 O(n)。重复命中缓存仍算函数调用，但不再展开子树。</p>
+<h3>循环递推：按编号主动填表</h3>
+<pre><code class="language-cpp">long long fibLoop(int n) {
     if (n &lt;= 1) return n;
     long long a = 0, b = 1;
     for (int i = 2; i &lt;= n; ++i) {
@@ -48,12 +109,498 @@ long long fibMemo(int n) {
     }
     return b;
 }
-</code></pre><p>每轮开始时 a=F(i-2)、b=F(i-1)。先计算 next，再移动 a、b，否则可能覆盖仍要用的旧值。时间 O(n)，额外空间 O(1)。</p><div class="table-wrap"><table><tr><th>实现</th><th>n=5 的答案</th><th>时间</th><th>额外空间</th><th>适用观察</th></tr><tr><td>朴素递归</td><td>5</td><td>指数级</td><td>O(n)</td><td>展示分解，规模很小</td></tr><tr><td>记忆化递归</td><td>5</td><td>O(n)</td><td>O(n)</td><td>状态依赖复杂，适合按需探索</td></tr><tr><td>循环递推</td><td>5</td><td>O(n)</td><td>O(1)</td><td>顺序清楚，可滚动保存</td></tr></table></div><p>这里的空间包括调用栈；整数加法按固定宽度 O(1) 计。递推与记忆化也是以后学习动态规划的两种常见实现方式。现在先掌握“状态、依赖、边界、顺序”，不用急着背术语。</p><h2 id="s5">入门自测：先过这一关</h2><p>1. 不看代码画出 fact(3) 的调用和返回过程。<br>2. 手写 F(0) 到 F(8)：0、1、1、2、3、5、8、13、21。<br>3. 删除记忆化的 seen 判断，程序答案是否改变？答：不变，但恢复大量重复计算。<br>4. 缓存会不会让所有递归都变快？答：不会；没有重复状态的阶乘只会多出缓存开销。<br>5. 能独立解释为何 F(n) 的循环从 2 开始，再进入下列六题。</p><p>---</p><h1>对照图片：六个经典例题</h1><p>以下为原创讲解与实现。题意仅概括，提交前阅读题目原页；不是题面全文复制。P1028 采用洛谷当前修订的“数列”表述，和旧书的拼接数字表述不同，递推关系一致。</p><h2 id="s6">P1255 数楼梯：从最后一步倒推</h2><p><a href="https://www.luogu.com.cn/problem/P1255">洛谷原题</a></p><p>定义 f[i]：到达第 i 级的走法数。把最后一步当作一扇门：从 i-1 跨一步，或者从 i-2 跨两步。两组走法互不重叠，所以相加。</p><p><code>f[i]=f[i-1]+f[i-2]</code>，<code>f[0]=1, f[1]=1</code>。f[0]=1 表示“什么也不走”的一种方案，它让跨两步到第 2 级的方案也被计入。</p><pre><code>第 i-2 级 ─── 跨2级 ───┐
+</code></pre>
+<p>每轮开始时 a=F(i-2)、b=F(i-1)。先计算 next，再移动 a、b，否则可能覆盖仍要用的旧值。时间 O(n)，额外空间 O(1)。</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>实现</th>
+<th>n=5 的答案</th>
+<th>时间</th>
+<th>额外空间</th>
+<th>适用观察</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>朴素递归</td>
+<td>5</td>
+<td>指数级</td>
+<td>O(n)</td>
+<td>展示分解，规模很小</td>
+</tr>
+<tr>
+<td>记忆化递归</td>
+<td>5</td>
+<td>O(n)</td>
+<td>O(n)</td>
+<td>状态依赖复杂，适合按需探索</td>
+</tr>
+<tr>
+<td>循环递推</td>
+<td>5</td>
+<td>O(n)</td>
+<td>O(1)</td>
+<td>顺序清楚，可滚动保存</td>
+</tr>
+</tbody>
+</table></div>
+<p>这里的空间包括调用栈；整数加法按固定宽度 O(1) 计。递推与记忆化也是以后学习动态规划的两种常见实现方式。现在先掌握“状态、依赖、边界、顺序”，不用急着背术语。</p>
+<h2 id="s6">入门自测：先过这一关</h2>
+<ol>
+<li>不看代码画出 fact(3) 的调用和返回过程。</li>
+<li>手写 F(0) 到 F(8)：0、1、1、2、3、5、8、13、21。</li>
+<li>删除记忆化的 seen 判断，程序答案是否改变？答：不变，但恢复大量重复计算。</li>
+<li>缓存会不会让所有递归都变快？答：不会；没有重复状态的阶乘只会多出缓存开销。</li>
+<li>能独立解释为何 F(n) 的循环从 2 开始，再进入下列六题。</li>
+</ol>
+<hr />
+<h1 id="s7">知识点全解：先理解，再套题</h1>
+<p>这一部分按图中的每个节点建立独立知识点。每节固定回答四个问题：是什么、为什么成立、怎样实现、何时使用。代码片段可合并运行，完整可运行版本见 <code>代码/01-知识点演示.cpp</code>；依赖 <code>&lt;iostream&gt;</code>、<code>&lt;vector&gt;</code>、<code>&lt;string&gt;</code>、<code>&lt;stack&gt;</code>、<code>&lt;algorithm&gt;</code>、<code>&lt;cassert&gt;</code>，并使用 <code>using namespace std;</code>。范围外的输入应先检查，不能把教学模板直接用于任意规模。</p>
+<h2 id="s8">图片知识点覆盖表</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>图片节点</th>
+<th>本节对应</th>
+<th>应达到的能力</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>递推思想</td>
+<td>K01 递推思想</td>
+<td>定义状态，安排计算顺序</td>
+</tr>
+<tr>
+<td>数楼梯：递推式</td>
+<td>K02 递推式与推导</td>
+<td>按最后一步分类，证明不重不漏</td>
+</tr>
+<tr>
+<td>数楼梯：初始条件</td>
+<td>K03 初始条件</td>
+<td>解释 f[0] 与 F[0] 为什么不同</td>
+</tr>
+<tr>
+<td>数楼梯：斐波那契数列</td>
+<td>K04 斐波那契</td>
+<td>区分数列本身与同型递推</td>
+</tr>
+<tr>
+<td>过河卒：二维递推</td>
+<td>K05 二维递推</td>
+<td>正确处理网格依赖和障碍</td>
+</tr>
+<tr>
+<td>栈：递推式的推导</td>
+<td>K06 栈与分类计数</td>
+<td>用匹配位置拆分合法操作</td>
+</tr>
+<tr>
+<td>栈：卡特兰数</td>
+<td>K07 卡特兰数</td>
+<td>推导递推式，识别等价模型</td>
+</tr>
+<tr>
+<td>递归思想</td>
+<td>K08 递归思想与调用栈</td>
+<td>说明出口、缩小和返回组合</td>
+</tr>
+<tr>
+<td>数的计算：分解成子问题</td>
+<td>K09 子问题分解</td>
+<td>写出函数含义，证明子问题更小</td>
+</tr>
+<tr>
+<td>数的计算：利用递归解决问题</td>
+<td>K10 递归求解与递推改写</td>
+<td>对比朴素递归、缓存和循环</td>
+</tr>
+<tr>
+<td>Function：递归记忆化</td>
+<td>K11 记忆化搜索</td>
+<td>完整定义缓存键，分析状态总数</td>
+</tr>
+<tr>
+<td>外星密码：较复杂的递归</td>
+<td>K12 嵌套递归与解析</td>
+<td>管理共享游标，处理多位数字</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s9">K01 递推思想</h2>
+<h3>概念</h3>
+<p>递推是根据已经确定的状态值，按依赖顺序计算新状态。状态是对一个子问题的精确描述，例如“到达第 i 级的走法数”，而不是含糊的“答案”。递推不一定只依赖前一项，也可以依赖两个更早项、一整段区间或二维表中的多个格子。</p>
+<h3>原理</h3>
+<p>像沿着已经铺好的砖走：每次落脚前，那块砖必须存在。若 f[i] 只依赖下标小于 i 的值，从小到大即可；若依赖右侧状态，就可能需要倒着算。正确性通常用数学归纳法说明：初始值正确；假设所依赖的状态正确，转移又完整且无重复，则新状态也正确。</p>
+<h3>C++ 实现</h3>
+<p>用求和作为最简单的例子：s[i]=s[i-1]+i，s[0]=0。</p>
+<pre><code class="language-cpp">long long prefixSum(int n) { // 0 &lt;= n &lt;= 1000000
+    long long answer = 0;
+    for (int i = 1; i &lt;= n; ++i) answer += i;
+    return answer;
+}
+</code></pre>
+<p>手推 n=4：0→1→3→6→10。时间 O(n)，空间 O(1)。把循环写成从 n 到 1 累加仍能算求和，是因为加法可交换；不能据此认为所有状态表都能倒着填。</p>
+<h3>作用与使用场景</h3>
+<p>适合数列计算、网格计数、前缀信息和依赖顺序清楚的动态规划。优点是没有递归栈开销，容易控制空间。若某状态的依赖尚未求出，就应重新安排顺序，不能拿数组默认的 0 当作它的答案。</p>
+<h2 id="s10">K02 递推式与递推式的推导</h2>
+<h3>概念</h3>
+<p>递推式是当前状态与较小状态之间的等式，是“怎样由已有答案得到新答案”的数学描述。推导不是猜几个数找规律，而是解释每一种合法方案从哪里来。</p>
+<h3>原理</h3>
+<p>对计数问题常用“看最后一步”：到第 i 级的方案按最后跨 1 级或 2 级划分。这两个类别互斥，并且覆盖全部方案。删除最后一步后分别对应到 i-1、i-2 的方案，所以 f[i]=f[i-1]+f[i-2]。</p>
+<pre><code class="language-text">所有到第 i 级的走法
+├─ 最后跨 1 级 ← 到 i-1 的任意走法
+└─ 最后跨 2 级 ← 到 i-2 的任意走法
+</code></pre>
+<p>不同情况任选其一，用加法；多个独立部分都要选择，用乘法。卡特兰数会同时用到这两条规则。若类别重叠就不能直接加；若前后选择互相限制，也不能不加分析就乘。</p>
+<h3>C++ 实现</h3>
+<pre><code class="language-cpp">long long stairsSmall(int n) { // 0 &lt;= n &lt;= 90
+    vector&lt;long long&gt; f(n + 2, 0);
+    f[0] = f[1] = 1;
+    for (int i = 2; i &lt;= n; ++i) f[i] = f[i-1] + f[i-2];
+    return f[n];
+}
+</code></pre>
+<p>n=3 时 <code>[1,1,1]</code>、<code>[1,2]</code>、<code>[2,1]</code> 共 3 种；按最后一步分成 2+1。时间 O(n)，空间 O(n)。这里仅用于小范围演示，P1255 的 n≤5000 要用后文的高精度实现。</p>
+<h3>作用与使用场景</h3>
+<p>看到“方案数”“最后一次操作”“选择一个分界点”时，可尝试分类建立递推式。写代码前先回答：有没有漏掉一种情况？某个方案会不会被算两次？对于最优值问题，同样可分类，但组合操作可能改为 min 或 max，而不是求和。</p>
+<h2 id="s11">K03 初始条件与边界条件</h2>
+<h3>概念</h3>
+<p>初始条件是直接已知、不再由转移计算的状态。边界条件还包括越界、不合法、障碍和递归停止情形。二者决定整条计算链从哪里开始、哪些地方不能走。</p>
+<h3>原理</h3>
+<p>只写 f[i]=f[i-1]+f[i-2] 无法唯一确定数列：初值 0、1 产生斐波那契；初值 1、1 产生楼梯计数。空方案常贡献 1，因为它是“完成零个选择”的一种方式；不存在的方案贡献 0。不能凭直觉把所有边界都写成 0 或 1。</p>
+<pre><code class="language-text">F(0)=0：斐波那契数列的定义
+楼梯 f(0)=1：在地面什么也不走，是一种走法
+卡特兰 C(0)=1：空括号串是一种合法结构
+障碍 dp(x,y)=0：没有合法路径能经过这里
+</code></pre>
+<h3>C++ 实现</h3>
+<pre><code class="language-cpp">long long stairsWithBoundary(int n) { // -1 &lt;= n &lt;= 90
+    if (n &lt; 0) return 0;     // 不可能到达负级数
+    if (n &lt;= 1) return 1;
+    long long a = 1, b = 1;
+    for (int i = 2; i &lt;= n; ++i) {
+        long long next = a + b;
+        a = b; b = next;
+    }
+    return b;
+}
+</code></pre>
+<p>例如把 f[0] 错设为 0，则 f[2]=1，只算到 <code>[1,1]</code>，漏掉 <code>[2]</code>。正确版本时间 O(n)，空间 O(1)。</p>
+<h3>作用与使用场景</h3>
+<p>每道递推、递归题都应先手推最小输入；网格题还应检查第一行、第一列、起点和终点。初值必须由状态的含义解释，而不是为了让某个样例通过临时调整。</p>
+<h2 id="s12">K04 斐波那契数列</h2>
+<h3>概念</h3>
+<p>斐波那契数列规定 F(0)=0、F(1)=1，之后每项是前两项之和：0、1、1、2、3、5、8、13……“斐波那契型”指相同或相近的依赖关系，初值和答案下标可能不同。</p>
+<h3>原理</h3>
+<p>F(n) 只需要 F(n-1)、F(n-2)，所以算完新项后，更早项可以丢弃。这是滚动保存状态的原理。楼梯计数 f(n)=F(n+1)，而不是 F(n)；必须先对齐初始条件。</p>
+<h3>C++ 实现</h3>
+<pre><code class="language-cpp">long long fibonacci(int n) { // 0 &lt;= n &lt;= 92
+    if (n &lt;= 1) return n;
+    long long a = 0, b = 1;
+    for (int i = 2; i &lt;= n; ++i) {
+        long long next = a + b; // 此时 a=F(i-2), b=F(i-1)
+        a = b;
+        b = next;
+    }
+    return b;
+}
+</code></pre>
+<p>时间 O(n)，空间 O(1)。F(92)=7540113804746346429 仍在有符号 long long 内，F(93) 超出；楼梯 f(91)=F(92) 仍能存下，但教学函数保守限定为 n≤90。若答案要求取模，则每次加法后取模；若要求完整大整数，则改用高精度，不能擅自取模。</p>
+<h3>作用与使用场景</h3>
+<p>固定步长为 1/2 的路径计数、某些铺砖模型和相邻状态有关的序列经常出现这种结构。先推关系再识别数列，不能看到“楼梯”“兔子”等词就套公式。大下标可进一步学矩阵快速幂或快速倍增，本章先掌握线性算法。</p>
+<h2 id="s13">K05 二维递推</h2>
+<h3>概念</h3>
+<p>二维状态由两个量共同确定。dp[x][y] 不是两个答案，而是“到坐标 (x,y) 的路径数”这一个答案。两个坐标缺少任意一个都无法区分子问题。</p>
+<h3>原理</h3>
+<p>只准向下、向右时，进入当前格的最后一步只能来自上方或左方。这些来源互斥：dp[x][y]=dp[x-1][y]+dp[x][y-1]。按行从上到下、行内从左到右填表，两个来源都已经算过。障碍格为 0，起点无障碍时为 1。</p>
+<pre><code class="language-text">无障碍 3×3 个格点（目标坐标为 2,2）
+1 → 1 → 1
+↓   ↓   ↓
+1 → 2 → 3
+↓   ↓   ↓
+1 → 3 → 6
+</code></pre>
+<h3>C++ 实现</h3>
+<pre><code class="language-cpp">long long gridWays(int n, int m, const vector&lt;vector&lt;bool&gt;&gt;&amp; blocked) {
+    // 0 &lt;= n,m &lt;= 20；blocked 的大小必须是 (n+1) × (m+1)
+    vector&lt;vector&lt;long long&gt;&gt; dp(n+1, vector&lt;long long&gt;(m+1, 0));
+    for (int x = 0; x &lt;= n; ++x) {
+        for (int y = 0; y &lt;= m; ++y) {
+            if (blocked[x][y]) continue;
+            if (x == 0 &amp;&amp; y == 0) { dp[x][y] = 1; continue; }
+            if (x &gt; 0) dp[x][y] += dp[x-1][y];
+            if (y &gt; 0) dp[x][y] += dp[x][y-1];
+        }
+    }
+    return dp[n][m];
+}
+</code></pre>
+<p>无障碍目标 (2,2) 得 6；把中间 (1,1) 设为障碍得 2。时间 O((n+1)(m+1))，空间同阶。P1002 只需先把马与控制点转换为 blocked，即可复用这一过程。</p>
+<h3>作用与使用场景</h3>
+<p>网格路线、两个序列前缀的关系、两个资源维度的动态规划都可能需要二维状态。但二维数组不等于网格题，也不保证都能按行填；必须检查真实依赖。若允许四向自由走动，可能有环，不能直接使用这个递推。</p>
+<h2 id="s14">K06 栈与“栈题递推式”的推导</h2>
+<h3>概念</h3>
+<p>栈是后进先出的容器，像叠盘子：后放上的先拿走。push 入栈，pop 弹出，top 查看顶部；栈空时不能 pop 或 top。P1044 数的是固定输入顺序下可产生多少种输出顺序。</p>
+<h3>原理</h3>
+<p>把入栈画作上坡、出栈画作下坡，当前高度就是栈内元素数，不能小于 0。也可记成左右括号。合法操作序列满足“总数匹配、每个前缀出栈不多于入栈”。</p>
+<pre><code class="language-text">操作： 入1 入2 出2 入3 出3 出1
+栈高：  1   2   1   2   1   0
+输出：          2       3   1
+括号： (   (   )   (   )   )
+</code></pre>
+<p>推导时找到第一次入栈与它配对的出栈：<code>(A)B</code>。内部 A 有 k 对，后面 B 有 n-1-k 对。同一 k 下 A、B 独立组合所以相乘；不同 k 互斥所以相加。每个合法串都有唯一的第一次匹配位置，保证不重不漏。这导出下一节的卡特兰递推。</p>
+<h3>C++ 实现</h3>
+<p>先用真实栈验证一个候选出栈顺序，理解模型；计数程序见 K07 和 P1044。</p>
+<pre><code class="language-cpp">bool validPopOrder(const vector&lt;int&gt;&amp; out) { // 输入顺序固定为 1..n
+    int n = static_cast&lt;int&gt;(out.size()), next = 1;
+    stack&lt;int&gt; st;
+    for (int wanted : out) {
+        if (wanted &lt; 1 || wanted &gt; n) return false;
+        while ((st.empty() || st.top() != wanted) &amp;&amp; next &lt;= n)
+            st.push(next++);
+        if (st.empty() || st.top() != wanted) return false;
+        st.pop();
+    }
+    return true;
+}
+</code></pre>
+<p><code>{2,3,1}</code> 合法，<code>{3,1,2}</code> 不合法：3 弹出后顶部是 2，无法跳过它拿到 1。每个数至多进出栈一次，验证时间 O(n)、空间 O(n)。</p>
+<h3>作用与使用场景</h3>
+<p>栈用于括号匹配、撤销操作、表达式处理和模拟递归调用。栈题不是一律用卡特兰数：只有输入顺序固定、元素互异、容量足够且没有额外约束时，P1044 的计数模型才直接适用；栈容量受限时要额外记录高度。</p>
+<h2 id="s15">K07 卡特兰数：概念、推导、实现与识别</h2>
+<h3>概念</h3>
+<p>卡特兰数是一组反复出现在“有嵌套结构、可唯一拆成左右两部分”的计数问题中的整数，记为 C_n。本章用合法括号解释：C_n 是 n 对括号的合法排列数量。前几项（从 n=0 开始）是 1、1、2、5、14、42、132。</p>
+<p>n=3 时合法串恰好五个：<code>((()))</code>、<code>(()())</code>、<code>(())()</code>、<code>()(())</code>、<code>()()()</code>。<code>())(()</code> 不合法，因为第三个位置时右括号比左括号多，等价于空栈出栈。</p>
+<h3>原理：从唯一分解得到卷积递推</h3>
+<p>任何非空合法括号串都能唯一写成 <code>(A)B</code>。第一对外壳用掉一对括号；A 用 k 对，B 用 n-1-k 对。A 有 C_k 种，B 有 C_(n-1-k) 种。它们独立，因此这一类有 C_k×C_(n-1-k) 种。遍历所有 k：</p>
+<p><code>C_0=1</code></p>
+<p><code>C_n = C_0*C_(n-1) + C_1*C_(n-2) + ... + C_(n-1)*C_0</code></p>
+<pre><code class="language-text">n=3：
+k=0  () B       1×2=2  → ()(())、()()()
+k=1  (()) B     1×1=1  → (())()
+k=2  ( A )      2×1=2  → ((()))、(()())
+合计                    5
+</code></pre>
+<p>C_0=1 的原因：空的 A 或 B 仍是一种选择。若设为 0，所有乘积都会变为 0。这里 C_n 只是卡特兰数记号，不是组合数；组合数在下文用 binom 表示，避免混淆。</p>
+<h3>原理：闭式为什么成立（进阶，可第二遍读）</h3>
+<p>把左括号看成向上一步，右括号看成向下一步，合法路径从高度 0 出发，2n 步后回到 0，且途中不低于 0。所有含 n 次上坡、n 次下坡的路径共有 binom(2n,n) 条。</p>
+<p>对不合法路径，找到它第一次到高度 -1 的位置，将此前路径的上下方向互换。变换后共有 n+1 次上坡、n-1 次下坡。反过来，对这种路径找到第一次到 +1 的位置并翻转前缀，就还原唯一的不合法路径。因此坏路径有 binom(2n,n+1) 条。</p>
+<p><code>C_n = binom(2n,n) - binom(2n,n+1) = binom(2n,n)/(n+1)</code>。</p>
+<p>由闭式还可整理出 <code>C_n=C_(n-1)*(4n-2)/(n+1)</code>。本节实现优先采用结构清楚的卷积；直接计算阶乘容易在中途溢出，最后结果能放下不代表中间值也能放下。若取模，整数除法不能直接换成模后除法；需要另外学习模逆元及其适用条件。</p>
+<h3>C++ 实现</h3>
+<pre><code class="language-cpp">vector&lt;long long&gt; catalanTable(int n) { // 0 &lt;= n &lt;= 35，完整整数
+    vector&lt;long long&gt; c(n+1, 0);
+    c[0] = 1;
+    for (int total = 1; total &lt;= n; ++total) {
+        for (int left = 0; left &lt; total; ++left) {
+            int right = total - 1 - left;
+            c[total] += c[left] * c[right];
+        }
+    }
+    return c;
+}
+</code></pre>
+<p>手算 C_4=1×5+1×2+2×1+5×1=14。时间 O(n²)，空间 O(n)。C_35=3116285494907301262 能放进有符号 long long，C_36 超出；本实现所有项非负，各乘积与部分和不超过最终 C_total，因此在约定范围内中间计算也安全。更大 n 用高精度或按题意取模。</p>
+<h3>作用与使用场景</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>模型</th>
+<th>规模如何对应</th>
+<th>为什么有相同结构</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>合法括号串</td>
+<td>n 对括号 → C_n</td>
+<td>唯一拆成 (A)B</td>
+</tr>
+<tr>
+<td>固定顺序入栈的出栈序列</td>
+<td>n 个互异元素 → C_n</td>
+<td>入/出对应左右括号</td>
+</tr>
+<tr>
+<td>不跌破横轴的上下坡路径</td>
+<td>n 上、n 下 → C_n</td>
+<td>前缀高度非负</td>
+</tr>
+<tr>
+<td>有序二叉树的形态数</td>
+<td>n 个节点，左右孩子位置不同 → C_n</td>
+<td>根占 1 个，左右子树占其余节点</td>
+</tr>
+<tr>
+<td>二元运算的完全加括号方式</td>
+<td>n+1 个操作数 → C_n</td>
+<td>最后一次运算分开左右表达式</td>
+</tr>
+<tr>
+<td>凸多边形三角剖分</td>
+<td>n+2 个顶点 → C_n</td>
+<td>选定边所属三角形分出两侧区域</td>
+</tr>
+</tbody>
+</table></div>
+<p>二叉树、完全加括号和多边形模型是拓展，用于识别场景，不要求本章立即实现。其经典对应关系可查阅 <a href="https://aofa.cs.princeton.edu/60trees/">Princeton 的树计数教材</a> 与 <a href="https://mathweb.ucsd.edu/~gptesler/184a/slides/catalan_19-handout.pdf">UCSD 卡特兰数课程讲义</a>。不要把任意树的数量、任意括号总数、带高度限制的路径都当作 C_n；先证明模型确实等价。</p>
+<h2 id="s16">K08 递归思想与调用栈</h2>
+<h3>概念</h3>
+<p>递归是函数直接或间接调用自身来处理同类型子问题。每次调用有自己的参数、局部变量和返回位置；调用栈保存尚未结束的各层工作。最深层先完成，外层随后恢复。</p>
+<h3>原理</h3>
+<p>递归正确性分三部分：边界能直接回答；调用的子问题规模严格下降；假设子问题答案正确，当前层的组合也正确。阶乘的规模是 n，n-1 不断减小，最终到 0。不能仅凭“代码里写了一个 if”就认为它会停止。</p>
+<h3>C++ 实现</h3>
+<pre><code class="language-cpp">long long factorial(int n) { // 0 &lt;= n &lt;= 20
+    if (n == 0) return 1;
+    long long smaller = factorial(n - 1);
+    return n * smaller;
+}
+</code></pre>
+<pre><code class="language-text">fact(3)：等待 3 × fact(2)
+  fact(2)：等待 2 × fact(1)
+    fact(1)：等待 1 × fact(0)
+      fact(0)：返回 1
+返回方向：1 → 1 → 2 → 6
+</code></pre>
+<p>时间 O(n)，栈空间 O(n)，不是 O(1)。把 <code>return n*smaller</code> 放在递归调用前会得不到子结果；递归函数不是“调用后从头重新跑父函数”，而是从父函数暂停处继续。</p>
+<h3>作用与使用场景</h3>
+<p>树的遍历、分治、深度优先搜索、嵌套语法解析适合递归，因为问题天然有层次。只有一条很长的依赖链时，循环常更省栈。阶乘没有重复子问题，记忆化不会降低一次查询的渐近复杂度。</p>
+<h2 id="s17">K09 分解成子问题</h2>
+<h3>概念</h3>
+<p>子问题是原问题在更小范围或更少资源下的同类问题。分解的关键是给函数一个精确承诺：例如 countSequences(n) 返回“首项为 n 的合法数列数量”，而不是“随便求一下答案”。</p>
+<h3>原理</h3>
+<p>对 P1028，第一项 n 后可以停止，也可以接 1..floor(n/2) 中的一个 k。选定 k 后，剩余结构与“首项为 k 的合法数列”完全相同。不同第二项的类别互斥，每条非单项序列都有且只有一个第二项，故不重不漏。</p>
+<p><code>f(n)=1+f(1)+...+f(floor(n/2))</code>，所有递归参数都小于 n。这个分解既给出计数规则，也给出终止证明。</p>
+<h3>C++ 实现</h3>
+<pre><code class="language-cpp">long long countSequencesSlow(int n) { // 教学示例：1 &lt;= n &lt;= 20
+    long long answer = 1; // 仅有 n 的单项数列
+    for (int k = 1; k &lt;= n/2; ++k)
+        answer += countSequencesSlow(k);
+    return answer;
+}
+</code></pre>
+<p>n=4 时：只保留 <code>[4]</code> 贡献 1，选 1 贡献 1，选 2 贡献 2，共 4。时间与递归树节点数成正比，存在重复状态，不是 O(n)；深度 O(log n)，因为参数每层至少减半。教学版限制小输入，完整范围用 K10 的缓存或后文递推。</p>
+<h3>作用与使用场景</h3>
+<p>面对“先选一个动作，余下仍是同一类问题”时可这样建模。分治也使用子问题，但常把数据划成独立部分，例如归并排序；本题子问题会重复出现，所以更适合再加记忆化。不要把递归、分治、记忆化当成同义词。</p>
+<h2 id="s18">K10 利用递归求解，并改写成递推</h2>
+<h3>概念</h3>
+<p>关系式是数学模型，递归和递推是两种执行方式。递归按需向下追问；递推按可用依赖顺序主动填表。理解同一关系的两种实现，可以避免只会背某一种代码。</p>
+<h3>原理</h3>
+<p>P1028 只依赖更小的正整数状态。递归可先算需要的 k，再返回 n；循环可先算 1、2……n。加缓存后各个状态只展开一次，但每个状态仍要枚举至多 n/2 个转移，因此总时间上界 O(n²)，不能因为“记忆化”就宣称 O(n)。</p>
+<h3>C++ 实现</h3>
+<pre><code class="language-cpp">long long sequenceMemoDfs(int n, vector&lt;long long&gt;&amp; memo) {
+    if (memo[n] != -1) return memo[n]; // 本题答案 &gt;= 1，-1 可作标记
+    long long answer = 1;
+    for (int k = 1; k &lt;= n/2; ++k)
+        answer += sequenceMemoDfs(k, memo);
+    return memo[n] = answer;
+}
+long long sequenceMemo(int n) { // 1 &lt;= n &lt;= 1000
+    vector&lt;long long&gt; memo(n+1, -1);
+    return sequenceMemoDfs(n, memo);
+}
+long long sequenceLoop(int n) { // 与上面计算相同的关系式
+    vector&lt;long long&gt; f(n+1, 0);
+    for (int i = 1; i &lt;= n; ++i) {
+        f[i] = 1;
+        for (int k = 1; k &lt;= i/2; ++k) f[i] += f[k];
+    }
+    return f[n];
+}
+</code></pre>
+<p>二者缓存/表空间 O(n)，递归版本另有 O(log n) 的调用栈。前缀和优化可用 <code>s[i]=s[i-1]+f[i]</code>，则 <code>f[i]=1+s[i/2]</code>，降为 O(n) 时间；先理解基础转移后再优化。</p>
+<h3>作用与使用场景</h3>
+<p>依赖复杂、只访问少量状态时，递归加缓存比较自然；状态密集、顺序清楚或栈深度危险时，递推更适合。递推改写不能改变状态含义、初值或转移，只改变求值顺序。</p>
+<h2 id="s19">K11 递归记忆化（记忆化搜索）</h2>
+<h3>概念</h3>
+<p>记忆化搜索在递归中保存每个状态的结果，下一次遇到同一状态就直接返回。它主要解决“不同路径走到了相同子问题”的重复计算，不负责自动修正错误的递归模型。</p>
+<h3>原理</h3>
+<p>斐波那契递归树中有许多相同的 F(3)、F(2)。缓存把这些重复节点合并成一个依赖图，每个状态只展开一次。Function 需要三个参数共同标识状态，所以必须用 memo[a][b][c]，只记 memo[a] 会把不同问题混在一起。</p>
+<pre><code class="language-text">边界判断 → 是否已计算？ → 是：返回缓存
+                         → 否：算所有依赖 → 保存结果 → 标记完成 → 返回
+</code></pre>
+<h3>C++ 实现</h3>
+<pre><code class="language-cpp">long long fibMemoDfs(int n, vector&lt;long long&gt;&amp; memo, vector&lt;bool&gt;&amp; seen) {
+    if (n &lt;= 1) return n;
+    if (seen[n]) return memo[n];
+    long long answer = fibMemoDfs(n-1, memo, seen)
+                     + fibMemoDfs(n-2, memo, seen);
+    memo[n] = answer;
+    seen[n] = true;
+    return answer;
+}
+long long fibonacciMemo(int n) { // 0 &lt;= n &lt;= 92
+    vector&lt;long long&gt; memo(n+1, 0);
+    vector&lt;bool&gt; seen(n+1, false);
+    return fibMemoDfs(n, memo, seen);
+}
+</code></pre>
+<p>F(5) 的朴素递归进入 15 次；这个版本进入 9 次，但 F(2)..F(5) 只各展开一次，其他重复请求直接命中。时间 O(n)，缓存和栈空间 O(n)。一般分析是“状态数 × 每个状态的转移开销”，更精确可计访问状态数与依赖边数之和。</p>
+<h3>作用与使用场景</h3>
+<p>适用于状态答案固定、有重复子问题、依赖最终能走向边界的问题，例如 Function、多维计数和 DAG 上的搜索。答案可能为 0 时不能通用地用 0 判断未计算；用 seen 或不可能出现的哨兵值。若参数依赖外部图或障碍，输入改变后应清空缓存。遇到环时需要额外的环处理或重新建模，“正在计算”不等于“已经算完”。</p>
+<h2 id="s20">K12 较复杂的递归：嵌套结构与共享游标</h2>
+<h3>概念</h3>
+<p>嵌套结构指一层内部还能包含相同类型的结构，例如括号里还有括号、目录里还有目录。每个递归调用只负责当前一层，把更内层完整交给子调用。</p>
+<h3>原理</h3>
+<p>对外星密码，每层处理三个事件：字母直接追加；<code>[</code> 后读完整次数并递归解析内部；<code>]</code> 结束本层。共享游标 pos 记录下一次要读的位置。函数返回时必须恰好越过自己负责的右括号，父层才能继续读后面的内容。</p>
+<pre><code class="language-text">A[2B[3C]]D
+外层： A + repeat(内层,2) + D
+内层： B + repeat(C,3) = BCCC
+结果： A + BCCCBCCC + D = ABCCCBCCCD
+</code></pre>
+<h3>C++ 实现</h3>
+<pre><code class="language-cpp">string parseLevel(const string&amp; s, size_t&amp; pos) { // 约定输入语法合法
+    string result;
+    while (pos &lt; s.size()) {
+        char ch = s[pos++];
+        if (ch == ']') return result; // 消费本层右括号后返回
+        if (ch != '[') { result += ch; continue; }
+        int times = 0;
+        while (pos &lt; s.size() &amp;&amp; s[pos] &gt;= '0' &amp;&amp; s[pos] &lt;= '9')
+            times = times*10 + (s[pos++] - '0');
+        string inner = parseLevel(s, pos);
+        for (int i = 0; i &lt; times; ++i) result += inner;
+    }
+    return result; // 最外层读到输入结束
+}
+string decodeText(const string&amp; s) {
+    size_t pos = 0;
+    return parseLevel(s, pos);
+}
+</code></pre>
+<p>注意 pos 按引用传递；若改为按值，每层只移动自己的副本，父层不会知道内部读到了哪里。两位次数要用循环读取；<code>[12A]</code> 应产生 12 个 A。每次读字符都会推进游标，输入有限且嵌套合法，因此会终止。设输入 N、最终输出 L、深度 H，保守时间 O(N+HL)，空间 O(N+HL+H)，含复制与各层字符串。</p>
+<h3>作用与使用场景</h3>
+<p>压缩串解码、表达式求值、括号语法与树形数据解析都可使用“当前层循环 + 内层递归”。复杂之处是管理层与层之间的边界，而不是把递归函数写得很长。外星密码的不同位置即使都读到同一个字母，也不代表返回范围相同；没有必要像斐波那契一样按字母做缓存。</p>
+<h2 id="s21">知识点综合检查</h2>
+<ol>
+<li>解释：为何楼梯 f[0]=1，而斐波那契 F[0]=0？</li>
+<li>手算：C_3、C_4，并标注每个乘积的左右规模。</li>
+<li>判断：禁止路径跌破横轴与普通无障碍网格路径，哪一个直接对应卡特兰数？</li>
+<li>写代码：把数的计算分别写成递归、记忆化和循环，比较结果。</li>
+<li>找错：Function 先检查 &gt;20 再检查 ≤0，会错在哪组输入？</li>
+<li>手推：<code>A[2B[3C]]D</code> 中每次递归返回后 pos 指向哪里？</li>
+</ol>
+<p>参考答案：1. 状态定义不同；2. 5、14；3. 前者；4. n=6 应都为 6；5. (-1,100,100)；6. 内层返回指向中层的右括号，中层返回指向 D，最外层最后读到串尾。</p>
+<hr />
+<h1 id="s22">对照图片：六个经典例题</h1>
+<p>以下为原创讲解与实现。题意仅概括，提交前阅读题目原页；不是题面全文复制。P1028 采用洛谷当前修订的“数列”表述，和旧书的拼接数字表述不同，递推关系一致。</p>
+<h2 id="s23">P1255 数楼梯：从最后一步倒推</h2>
+<p><a href="https://www.luogu.com.cn/problem/P1255">洛谷原题</a></p>
+<p>定义 f[i]：到达第 i 级的走法数。把最后一步当作一扇门：从 i-1 跨一步，或者从 i-2 跨两步。两组走法互不重叠，所以相加。</p>
+<p><code>f[i]=f[i-1]+f[i-2]</code>，<code>f[0]=1, f[1]=1</code>。f[0]=1 表示“什么也不走”的一种方案，它让跨两步到第 2 级的方案也被计入。</p>
+<pre><code class="language-text">第 i-2 级 ─── 跨2级 ───┐
                         ├──→ 第 i 级
 第 i-1 级 ─── 跨1级 ───┘
 级数       0  1  2  3  4  5
 方案数     1  1  2  3  5  8
-</code></pre><p>这是斐波那契型递推，但 f[n]=F(n+1)，不要照抄 F(0)=0。题目 n 最大 5000，必须高精度。下面用倒序十进制数组做加法：个位先加、向高位进位。每位最多 9+9+1=19。</p><p>若答案位数为 D，总时间 O(nD)，滚动存储 O(D)；这里 D 随 n 线性增长。自测：1→1，2→2，5→8。练习：允许跨 1、2、3 级时怎样改式子？提示：三个来源，越界项不计。</p><h3>完整 C++17 程序</h3><pre><code>#include &lt;iostream&gt;
+</code></pre>
+<p>这是斐波那契型递推，但 f[n]=F(n+1)，不要照抄 F(0)=0。题目 n 最大 5000，必须高精度。下面用倒序十进制数组做加法：个位先加、向高位进位。每位最多 9+9+1=19。</p>
+<p>若答案位数为 D，总时间 O(nD)，滚动存储 O(D)；这里 D 随 n 线性增长。自测：1→1，2→2，5→8。练习：允许跨 1、2、3 级时怎样改式子？提示：三个来源，越界项不计。</p>
+<h3>完整 C++17 程序</h3>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;vector&gt;
 #include &lt;algorithm&gt;
 using namespace std;
@@ -77,12 +624,20 @@ int main() {
         a = b; b = c;
     }
     for (auto it = b.rbegin(); it != b.rend(); ++it) cout &lt;&lt; *it;
-    cout &lt;&lt; &#x27;\n&#x27;;
+    cout &lt;&lt; '\n';
 }
-</code></pre><h2 id="s7">P1002 过河卒：在棋盘上填表</h2><p><a href="https://www.luogu.com.cn/problem/P1002">洛谷原题</a></p><p>定义 dp[x][y]：从 (0,0) 到 (x,y) 的合法路径数。最后一步只能来自 (x-1,y) 或 (x,y-1)，所以可走点填两个来源之和；禁止点直接填 0。</p><pre><code>     上方 dp[x-1][y]
+</code></pre>
+<h2 id="s24">P1002 过河卒：在棋盘上填表</h2>
+<p><a href="https://www.luogu.com.cn/problem/P1002">洛谷原题</a></p>
+<p>定义 dp[x][y]：从 (0,0) 到 (x,y) 的合法路径数。最后一步只能来自 (x-1,y) 或 (x,y-1)，所以可走点填两个来源之和；禁止点直接填 0。</p>
+<pre><code class="language-text">     上方 dp[x-1][y]
              ↓
 左方 → 当前格 = 上方 + 左方
-</code></pre><p>先标记马自身和八个日字跳跃位置，再设置起点。如果先填起点，随后错误覆盖禁区，就可能制造不存在的路径。坐标范围是 0..n、0..m，包含端点，因此数组至少 21×21。第一行和第一列只有一个方向的来源；不要一律初始化为 1，因为中间可能被阻断。</p><p>时间 O(nm)，空间 O(nm)。无障碍 20×20 的路径数为 C(40,20)=137846528820，int 不够，使用 long long。自测：<code>6 6 3 3</code>→6；<code>2 2 1 1</code>→0。练习：在动画中移动马，解释为什么禁区之后仍可能绕路到达。</p><h3>完整 C++17 程序</h3><pre><code>#include &lt;iostream&gt;
+</code></pre>
+<p>先标记马自身和八个日字跳跃位置，再设置起点。如果先填起点，随后错误覆盖禁区，就可能制造不存在的路径。坐标范围是 0..n、0..m，包含端点，因此数组至少 21×21。第一行和第一列只有一个方向的来源；不要一律初始化为 1，因为中间可能被阻断。</p>
+<p>时间 O(nm)，空间 O(nm)。无障碍 20×20 的路径数为 C(40,20)=137846528820，int 不够，使用 long long。自测：<code>6 6 3 3</code>→6；<code>2 2 1 1</code>→0。练习：对照固定马位置的动画，解释为什么禁区之后仍可能绕路到达。</p>
+<h3>完整 C++17 程序</h3>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
 using namespace std;
 long long dp[21][21]{};
 bool blocked[21][21]{};
@@ -100,25 +655,43 @@ int main() {
         if(x&gt;0) dp[x][y]+=dp[x-1][y];
         if(y&gt;0) dp[x][y]+=dp[x][y-1];
     }
-    cout &lt;&lt; dp[n][m] &lt;&lt; &#x27;\n&#x27;;
+    cout &lt;&lt; dp[n][m] &lt;&lt; '\n';
 }
-</code></pre><h2 id="s8">P1044 栈：把合法操作拆成两段</h2><p><a href="https://www.luogu.com.cn/problem/P1044">洛谷原题</a></p><p>把入栈记为左括号，出栈记为右括号。栈不能为空时出栈，所以任意前缀的出栈次数不能多于入栈次数。n=3 时 5 种合法括号串为 <code>((()))</code>、<code>(()())</code>、<code>(())()</code>、<code>()(())</code>、<code>()()()</code>。</p><pre><code>整体 = ( 内部合法序列 A ) 外部合法序列 B
+</code></pre>
+<h2 id="s25">P1044 栈：把合法操作拆成两段</h2>
+<p><a href="https://www.luogu.com.cn/problem/P1044">洛谷原题</a></p>
+<p>把入栈记为左括号，出栈记为右括号。栈不能为空时出栈，所以任意前缀的出栈次数不能多于入栈次数。n=3 时 5 种合法括号串为 <code>((()))</code>、<code>(()())</code>、<code>(())()</code>、<code>()(())</code>、<code>()()()</code>。</p>
+<pre><code class="language-text">整体 = ( 内部合法序列 A ) 外部合法序列 B
          k 对             n-1-k 对
-</code></pre><p>按第一个左括号匹配的右括号划分，每个合法序列的拆法唯一。内部和外部独立选择，方案数相乘；枚举 k 的各类互斥，最后相加：</p><p><code>C[n] = Σ C[k] * C[n-1-k]</code>，k=0..n-1，<code>C[0]=1</code>。空序列有一种，不能设成 0。这就是卡特兰数。固定输入顺序时，每个可行输出顺序对应唯一的合法进出栈过程，所以可以数这些括号串。</p><p>时间 O(n²)，空间 O(n)。n≤18，long long 足够。自测：1→1、3→5、18→477638700。练习：手算 C[4]=5+2+2+5=14，并解释每一项从哪里来。</p><h3>完整 C++17 程序</h3><pre><code>#include &lt;iostream&gt;
+</code></pre>
+<p>按第一个左括号匹配的右括号划分，每个合法序列的拆法唯一。内部和外部独立选择，方案数相乘；枚举 k 的各类互斥，最后相加：</p>
+<p><code>C[n] = Σ C[k] * C[n-1-k]</code>，k=0..n-1，<code>C[0]=1</code>。空序列有一种，不能设成 0。这就是卡特兰数。固定输入顺序时，每个可行输出顺序对应唯一的合法进出栈过程，所以可以数这些括号串。</p>
+<p>时间 O(n²)，空间 O(n)。n≤18，long long 足够。自测：1→1、3→5、18→477638700。练习：手算 C[4]=5+2+2+5=14，并解释每一项从哪里来。</p>
+<h3>完整 C++17 程序</h3>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
 using namespace std;
 int main() {
     int n; cin &gt;&gt; n;
     long long c[19]{}; c[0]=1;
     for(int i=1;i&lt;=n;++i)
         for(int k=0;k&lt;i;++k) c[i]+=c[k]*c[i-1-k];
-    cout &lt;&lt; c[n] &lt;&lt; &#x27;\n&#x27;;
+    cout &lt;&lt; c[n] &lt;&lt; '\n';
 }
-</code></pre><h2 id="s9">P1028 数的计算：递归分解与循环实现</h2><p><a href="https://www.luogu.com.cn/problem/P1028">洛谷原题</a></p><p>令 f(n) 为从 n 开始的合法数列数量。可以马上停止（贡献 1），也可以选下一个数 k，1≤k≤⌊n/2⌋，之后全部交给 f(k)。</p><p><code>f(n)=1+Σ f(k)</code>，k=1..⌊n/2⌋。例如 n=6：停止；接 1；接 2 后可停止或接 1；接 3 后可停止或接 1。总数 1+1+2+2=6。</p><pre><code>6
+</code></pre>
+<h2 id="s26">P1028 数的计算：递归分解与循环实现</h2>
+<p><a href="https://www.luogu.com.cn/problem/P1028">洛谷原题</a></p>
+<p>令 f(n) 为从 n 开始的合法数列数量。可以马上停止（贡献 1），也可以选下一个数 k，1≤k≤⌊n/2⌋，之后全部交给 f(k)。</p>
+<p><code>f(n)=1+Σ f(k)</code>，k=1..⌊n/2⌋。例如 n=6：停止；接 1；接 2 后可停止或接 1；接 3 后可停止或接 1。总数 1+1+2+2=6。</p>
+<pre><code class="language-text">6
 ├─ 停止： [6]
 ├─ 1：    [6,1]
 ├─ 2：    [6,2]， [6,2,1]
 └─ 3：    [6,3]， [6,3,1]
-</code></pre><p>递归函数可写 <code>ans=1; for(k=1;k&lt;=n/2;++k) ans+=solve(k);</code>，n=1 时循环为空，返回 1。k 总小于 n，所以会终止；加缓存可避免重复。下面按 n 从小到大递推，同样体现子问题思想。</p><p>此版时间 O(n²)，空间 O(n)。n≤1000，long long 足够。自测：1→1、6→6、10→14。进阶：利用前缀和把总时间降到 O(n)，但先独立写出基础版。</p><h3>完整 C++17 程序</h3><pre><code>#include &lt;iostream&gt;
+</code></pre>
+<p>递归函数可写 <code>ans=1; for(k=1;k&lt;=n/2;++k) ans+=solve(k);</code>，n=1 时循环为空，返回 1。k 总小于 n，所以会终止；加缓存可避免重复。下面按 n 从小到大递推，同样体现子问题思想。</p>
+<p>此版时间 O(n²)，空间 O(n)。n≤1000，long long 足够。自测：1→1、6→6、10→14。进阶：利用前缀和把总时间降到 O(n)，但先独立写出基础版。</p>
+<h3>完整 C++17 程序</h3>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;vector&gt;
 using namespace std;
 int main() {
@@ -128,12 +701,27 @@ int main() {
         f[i]=1; // 只保留当前数，立即停止
         for(int k=1;k&lt;=i/2;++k) f[i]+=f[k];
     }
-    cout &lt;&lt; f[n] &lt;&lt; &#x27;\n&#x27;;
+    cout &lt;&lt; f[n] &lt;&lt; '\n';
 }
-</code></pre><h2 id="s10">P1464 Function：给三个参数建立缓存</h2><p><a href="https://www.luogu.com.cn/problem/P1464">洛谷原题</a></p><p>先把题目定义翻译成四个分支，顺序不能改变：</p><p>1. 任一参数≤0：返回 1。<br>2. 否则任一参数&gt;20：转成 w(20,20,20)。<br>3. 否则 a&lt;b&lt;c：使用三个子问题相加减的公式。<br>4. 其他情况：使用四个子问题相加减的公式。</p><p>第二条必须在第一条之后。例如 (-1,100,100) 应返回 1。只有确认三个参数都在 1..20 后才访问缓存；输入本身可能很大或很小，用 long long 读取，不能直接拿输入当下标。</p><pre><code>w(a,b,c) → 边界检查 → 查 memo[a][b][c]
+</code></pre>
+<h2 id="s27">P1464 Function：给三个参数建立缓存</h2>
+<p><a href="https://www.luogu.com.cn/problem/P1464">洛谷原题</a></p>
+<p>先把题目定义翻译成四个分支，顺序不能改变：</p>
+<ol>
+<li>任一参数≤0：返回 1。</li>
+<li>否则任一参数&gt;20：转成 w(20,20,20)。</li>
+<li>否则 a&lt;b&lt;c：使用三个子问题相加减的公式。</li>
+<li>其他情况：使用四个子问题相加减的公式。</li>
+</ol>
+<p>第二条必须在第一条之后。例如 (-1,100,100) 应返回 1。只有确认三个参数都在 1..20 后才访问缓存；输入本身可能很大或很小，用 long long 读取，不能直接拿输入当下标。</p>
+<pre><code class="language-text">w(a,b,c) → 边界检查 → 查 memo[a][b][c]
                           ├─ 已有：直接返回
                           └─ 没有：递归计算 → 保存 → 返回
-</code></pre><p>最多 20³ 个正参数状态，每个展开常数条转移，预处理总量 O(20³)，T 次查询合计 O(20³+T)。缓存空间 O(21³)，活动递归链 O(20)（参数和下降，常数上界约 60 层）。答案可复用，多组输入不要每行清空。仅三项全是 -1 才结束，输出保留原输入和规定空格。</p><p>自测：<code>1 1 1</code>→2，<code>20 20 20</code>→1048576，<code>-1 100 100</code>→1。练习：指出每个分支如何让递归走向边界。</p><h3>完整 C++17 程序</h3><pre><code>#include &lt;iostream&gt;
+</code></pre>
+<p>最多 20³ 个正参数状态，每个展开常数条转移，预处理总量 O(20³)，T 次查询合计 O(20³+T)。缓存空间 O(21³)，活动递归链 O(20)（参数和下降，常数上界约 60 层）。答案可复用，多组输入不要每行清空。仅三项全是 -1 才结束，输出保留原输入和规定空格。</p>
+<p>自测：<code>1 1 1</code>→2，<code>20 20 20</code>→1048576，<code>-1 100 100</code>→1。练习：指出每个分支如何让递归走向边界。</p>
+<h3>完整 C++17 程序</h3>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
 using namespace std;
 long long memo[21][21][21]{};
 bool seen[21][21][21]{};
@@ -154,14 +742,23 @@ int main() {
     long long a,b,c;
     while(cin&gt;&gt;a&gt;&gt;b&gt;&gt;c) {
         if(a==-1 &amp;&amp; b==-1 &amp;&amp; c==-1) break;
-        cout&lt;&lt;&quot;w(&quot;&lt;&lt;a&lt;&lt;&quot;, &quot;&lt;&lt;b&lt;&lt;&quot;, &quot;&lt;&lt;c&lt;&lt;&quot;) = &quot;&lt;&lt;w(a,b,c)&lt;&lt;&#x27;\n&#x27;;
+        cout&lt;&lt;&quot;w(&quot;&lt;&lt;a&lt;&lt;&quot;, &quot;&lt;&lt;b&lt;&lt;&quot;, &quot;&lt;&lt;c&lt;&lt;&quot;) = &quot;&lt;&lt;w(a,b,c)&lt;&lt;'\n';
     }
 }
-</code></pre><h2 id="s11">P1928 外星密码：每层递归负责一对括号</h2><p><a href="https://www.luogu.com.cn/problem/P1928">洛谷原题</a></p><p>本题像拆套娃。函数 decode 负责读取当前层，遇见字母直接收集，遇见 <code>[</code> 先读完整重复次数，再递归解出内部字符串；遇到 <code>]</code> 消费它并返回。</p><pre><code>输入 A[2B[3C]]
+</code></pre>
+<h2 id="s28">P1928 外星密码：每层递归负责一对括号</h2>
+<p><a href="https://www.luogu.com.cn/problem/P1928">洛谷原题</a></p>
+<p>本题像拆套娃。函数 decode 负责读取当前层，遇见字母直接收集，遇见 <code>[</code> 先读完整重复次数，再递归解出内部字符串；遇到 <code>]</code> 消费它并返回。</p>
+<pre><code class="language-text">输入 A[2B[3C]]
 内层 [3C] → CCC
 中层 [2BCCC] → BCCCBCCC
 外层 → ABCCCBCCC
-</code></pre><p>共享下标 pos 就像所有人传递的阅读书签。函数返回后，书签必须在它负责的右括号之后，否则父层可能提前结束。次数可能是两位数，用 while 连续读数字；<code>k=k*10+数字</code>，不能只读一个字符。</p><p>终止条件是读到本层右括号或输入结束；每次循环都会前进下标。题目保证合法输入，因此本例不负责修复不匹配括号。最大嵌套深度 10，输出长度最多 20000。</p><p>设输入长 N、最终输出长 L、深度 H，此实现保守时间 O(N+HL)，因为每层会复制子串；额外空间保守 O(N+HL+H)，含输入、各层字符串和调用栈。自测：<code>[3AB]</code>→ABABAB、<code>A[2B[3C]]</code>→ABCCCBCCC。练习：把数字读取错误写成只读一位，用 <code>[12A]</code> 检查会发生什么。</p><h3>完整 C++17 程序</h3><pre><code>#include &lt;iostream&gt;
+</code></pre>
+<p>共享下标 pos 就像所有人传递的阅读书签。函数返回后，书签必须在它负责的右括号之后，否则父层可能提前结束。次数可能是两位数，用 while 连续读数字；<code>k=k*10+数字</code>，不能只读一个字符。</p>
+<p>终止条件是读到本层右括号或输入结束；每次循环都会前进下标。题目保证合法输入，因此本例不负责修复不匹配括号。最大嵌套深度 10，输出长度最多 20000。</p>
+<p>设输入长 N、最终输出长 L、深度 H，此实现保守时间 O(N+HL)，因为每层会复制子串；额外空间保守 O(N+HL+H)，含输入、各层字符串和调用栈。自测：<code>[3AB]</code>→ABABAB、<code>A[2B[3C]]</code>→ABCCCBCCC。练习：把数字读取错误写成只读一位，用 <code>[12A]</code> 检查会发生什么。</p>
+<h3>完整 C++17 程序</h3>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;string&gt;
 #include &lt;cctype&gt;
 using namespace std;
@@ -171,11 +768,11 @@ string decode() {
     string result;
     while(pos&lt;s.size()) {
         char ch=s[pos++];
-        if(ch==&#x27;]&#x27;) return result;
-        if(ch==&#x27;[&#x27;) {
+        if(ch==']') return result;
+        if(ch=='[') {
             int count=0;
             while(pos&lt;s.size() &amp;&amp; isdigit(static_cast&lt;unsigned char&gt;(s[pos])))
-                count=count*10+(s[pos++]-&#x27;0&#x27;);
+                count=count*10+(s[pos++]-'0');
             string inner=decode();
             for(int i=0;i&lt;count;++i) result+=inner;
         } else result+=ch;
@@ -184,9 +781,14 @@ string decode() {
 }
 int main() {
     cin&gt;&gt;s;
-    cout&lt;&lt;decode()&lt;&lt;&#x27;\n&#x27;;
+    cout&lt;&lt;decode()&lt;&lt;'\n';
 }
-</code></pre><h2 id="s12">如何安排学习</h2><p>第一轮只读三个入门概念并手写简单程序；第二轮做数楼梯和过河卒，练状态与边界；第三轮做栈和数的计算，练分类计数；第四轮做 Function 和外星密码，练缓存与嵌套递归。每次复习先遮住代码，自己写出状态和关系式。</p><p>常见错误：初始值照抄、整型溢出、禁止格没清零、递归不缩小、缓存键缺参数、下标越界、忘记多位数字、右括号未消费。遇到错误先用最小例子手推。</p><h2 id="s13">来源与范围</h2><p>章节结构依据用户提供的思维导图；题目链接与范围于 2026-11-05 核对洛谷原页。<a href="https://www.luogu.com.cn/training/109">官方题单</a>。Function 页面文本提取缺失的公式按经典定义实现，并由独立自底向上程序交叉验证。讲解、图解和代码为本次编写；本地测试不代表洛谷在线评测通过。</p></article><footer>2026-11-05 · 本地学习资料 · 代码测试结果见验证报告；学习进度请在学习日志中记录。</footer></main><script>
+</code></pre>
+<h2 id="s29">如何安排学习</h2>
+<p>第一轮只读三个入门概念并手写简单程序；第二轮做数楼梯和过河卒，练状态与边界；第三轮做栈和数的计算，练分类计数；第四轮做 Function 和外星密码，练缓存与嵌套递归。每次复习先遮住代码，自己写出状态和关系式。</p>
+<p>常见错误：初始值照抄、整型溢出、禁止格没清零、递归不缩小、缓存键缺参数、下标越界、忘记多位数字、右括号未消费。遇到错误先用最小例子手推。</p>
+<h2 id="s30">来源与范围</h2>
+<p>章节结构依据用户提供的思维导图；题目链接与范围于 2026-11-05 核对洛谷原页。<a href="https://www.luogu.com.cn/training/109">官方题单</a>。Function 页面文本提取缺失的公式按经典定义实现，并由独立自底向上程序交叉验证。讲解、图解和代码为本次编写；本地测试不代表洛谷在线评测通过。</p></article><footer>2026-11-05 · 本地学习资料 · 代码测试结果见验证报告；学习进度请在学习日志中记录。</footer></main><script>
 const $=id=>document.getElementById(id);let frames=[],step=0,timer=null;
 function cell(label,value,active=false,block=false){return {label,value,active,block};}
 function push(caption,cells,kind='cells'){frames.push({caption,cells:structuredClone(cells),kind});}
@@ -196,6 +798,7 @@ if(name==='fact'){let stack=[];for(let n=4;n>=0;n--){stack.push(cell('fact('+n+'
 if(name==='memo'){let memo={},stack=[],calls=0;function f(n){calls++;stack.push(n);push('进入 F('+n+')；调用链 '+stack.join(' → '),Object.entries(memo).map(([k,v])=>cell('缓存 F('+k+')',v)));if(n<=1){push('边界 F('+n+')='+n+'，直接返回。',[cell('返回',n,true)]);stack.pop();return n;}if(memo[n]!==undefined){push('命中缓存 F('+n+')，不再展开子树。',Object.entries(memo).map(([k,v])=>cell('F('+k+')',v,+k===n)));stack.pop();return memo[n];}let a=f(n-1),b=f(n-2);memo[n]=a+b;push(`保存 F(${n}) = ${a} + ${b} = ${memo[n]}`,Object.entries(memo).map(([k,v])=>cell('F('+k+')',v,+k===n)));stack.pop();return memo[n];}f(5);push(`完成 F(5)=5，共 ${calls} 次函数进入；朴素递归需要 15 次。`,Object.entries(memo).map(([k,v])=>cell('F('+k+')',v)));}
 if(name==='stairs'){let a=[1,1];for(let i=2;i<=8;i++)a[i]=a[i-1]+a[i-2];for(let t=1;t<=8;t++)push(t===1?'初始 f[0]=f[1]=1。':`f[${t}] = f[${t-1}] + f[${t-2}] = ${a[t-1]} + ${a[t-2]} = ${a[t]}`,a.map((v,i)=>cell('第 '+i+' 级',i<=t?v:'?',i===t)));}
 if(name==='grid'){let n=6,m=6,hx=3,hy=3,dp=Array.from({length:7},()=>Array(7).fill(0));let bad=(x,y)=>x===hx&&y===hy||Math.abs(x-hx)*Math.abs(y-hy)===2;function board(cx,cy){let cells=[];for(let x=0;x<=n;x++)for(let y=0;y<=m;y++)cells.push(cell(x+','+y,bad(x,y)?'禁':x<cx||x===cx&&y<=cy?dp[x][y]:'·',x===cx&&y===cy,bad(x,y)));return cells;}push('马在 (3,3)，红色“禁”包括马本身和八个日字位置。横向为 y，纵向为 x。',board(-1,-1),'grid');for(let x=0;x<=n;x++)for(let y=0;y<=m;y++){if(!bad(x,y))dp[x][y]=x===0&&y===0?1:(x?dp[x-1][y]:0)+(y?dp[x][y-1]:0);push(bad(x,y)?`(${x},${y}) 被控制，路径数为 0。`:`填 (${x},${y})：${x===0&&y===0?'起点设为 1':'上方与左方相加得 '+dp[x][y]}`,board(x,y),'grid');}}
+if(name==='brackets'){for(const s of ['((()))','(()())','(())()','()(())','()()()']){let h=0;let cells=[cell('起点',0)];for(let i=0;i<s.length;i++){h+=s[i]==='('?1:-1;cells.push(cell(s[i],h,true));push('括号串 '+s+'：读到第 '+(i+1)+' 个字符；高度 '+h+'，前缀始终非负。',cells);cells[cells.length-1].active=false;}push('合法串 '+s+' 完成：3 次入栈、3 次出栈，高度回到 0。',cells);}push('n=3 恰好这五种合法串，所以 C[3]=5。不是从所有排列中随便选五个。',[cell('卡特兰 C[3]',5,true)]);}
 if(name==='catalan'){let c=[1];push('空序列有一种：C[0]=1。',[cell('C[0]',1,true)]);for(let n=1;n<=5;n++){c[n]=0;for(let k=0;k<n;k++){let term=c[k]*c[n-1-k];c[n]+=term;push(`n=${n}：内部 ${k} 对，外部 ${n-1-k} 对；增加 ${c[k]}×${c[n-1-k]}=${term}。`,c.map((v,i)=>cell('C['+i+']',v,i===n)));}}}
 if(name==='number'){let f=[0];for(let n=1;n<=10;n++){f[n]=1;push(`f(${n}) 先计入“马上停止”的 1 种。`,f.slice(1).map((v,i)=>cell('f('+(i+1)+')',v,i+1===n)));for(let k=1;k<=Math.floor(n/2);k++){f[n]+=f[k];push(`下一项选 ${k}，加上 f(${k})=${f[k]}；f(${n}) 暂为 ${f[n]}。`,f.slice(1).map((v,i)=>cell('f('+(i+1)+')',v,i+1===n)));}}}
 if(name==='function'){let cache={};function w(a,b,c){if(a<=0||b<=0||c<=0)return 1;let key=[a,b,c].join(',');if(cache[key]!==undefined)return cache[key];return cache[key]=a<b&&b<c?w(a,b,c-1)+w(a,b-1,c-1)-w(a,b-1,c):w(a-1,b,c)+w(a-1,b-1,c)+w(a-1,b,c-1)-w(a-1,b-1,c-1);}push('演示查询 w(2,2,2)，最初缓存为空。',[cell('缓存','空')]);let ans=w(2,2,2);push('首次查询按公式递归，只保存实际访问的非边界状态。',Object.entries(cache).map(([k,v])=>cell('w('+k+')',v,k==='2,2,2')));push('结果 w(2,2,2)='+ans+'；再次查询直接命中，整棵子树都不必展开。',[cell('缓存命中 w(2,2,2)',ans,true)]);push('(-1,100,100) 先满足非正数边界，结果为 1；不要先截断成 (20,20,20)。',[cell('边界优先',1,true)]);}

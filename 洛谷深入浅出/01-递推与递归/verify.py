@@ -13,6 +13,7 @@ def check(key,inp,expected):
     r=subprocess.run([str(exes[key])],input=inp,text=True,capture_output=True,timeout=8)
     assert r.returncode==0 and r.stdout.strip()==str(expected).strip(),(key,inp,r.stdout,expected,r.stderr)
     count+=1
+check('01-知识点演示', '', 'knowledge checks passed')
 for n in [0,1,5,20]:
     a,b=0,1
     for _ in range(n):a,b=b,a+b
@@ -50,5 +51,5 @@ for a,b,c in cases:
  expected.append(f'w({a}, {b}, {c}) = {ans}')
 check('P1464','\n'.join(' '.join(map(str,c)) for c in cases)+'\n-1 -1 -1\n','\n'.join(expected))
 for inp,out in [('ABC','ABC'),('[3AB]','AB'*3),('A[2B[3C]]','ABCCCBCCC'),('[12A]','A'*12),('[2[2[2CB]]]','CB'*8),('[99[99AB]]','AB'*9801)]:check('P1928',inp,out)
-(p/'验证报告.md').write_text(f'''# 验证报告\n\n2026-11-05：7 个 C++17 程序通过 g++ -Wall -Wextra -O2 编译，无警告；{count} 组进程级测试全部通过，其中 Function 单组进程包含 {len(cases)} 个查询。\n\n覆盖：入门的 0/1/5/20、楼梯 5000 阶高精度、栈 18、数的计算 1000、马控制点与棋盘边界、Function 大整数输入与边界顺序、外星密码两位次数与多层嵌套。Function 使用独立自底向上表交叉验证。\n\n这是本地验证，不代表已提交洛谷或通过在线评测。\n''',encoding='utf-8')
+(p/'验证报告.md').write_text(f'''# 验证报告\n\n2026-11-05：{len(exes)} 个 C++17 程序通过 g++ -Wall -Wextra -O2 编译，无警告；{count} 组进程级测试全部通过，其中 Function 单组进程包含 {len(cases)} 个查询。\n\n覆盖：入门的 0/1/5/20、楼梯 5000 阶高精度、栈 18、数的计算 1000、马控制点与棋盘边界、Function 大整数输入与边界顺序、外星密码两位次数与多层嵌套。Function 使用独立自底向上表交叉验证。\n\n这是本地验证，不代表已提交洛谷或通过在线评测。\n''',encoding='utf-8')
 print('PASS',count,'process tests;',len(cases),'Function queries')
