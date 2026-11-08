@@ -1,0 +1,995 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第二章 · 贪心与哈夫曼编码</title><style>
+:root{color-scheme:light;--bg:#f4f6fa;--ink:#20304a;--paper:#fff;--blue:#2865cd;--line:#dbe3ee}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.85 system-ui,'Microsoft YaHei',sans-serif}header{background:#162d50;color:#fff;padding:52px max(24px,calc((100vw - 1120px)/2))}header small{color:#a9ccff;letter-spacing:3px}header h1{font-size:clamp(30px,5vw,52px);margin:10px 0}header p{max-width:700px;color:#d5e1f3}main{max-width:1180px;margin:32px auto;padding:0 24px}article{background:var(--paper);padding:clamp(20px,4vw,52px);border-radius:16px}h2{margin-top:48px;border-bottom:2px solid var(--line);padding-bottom:12px;scroll-margin-top:20px}h3{color:var(--blue)}a{color:var(--blue)}pre{overflow:auto;background:#17263d;color:#e2ebfc;padding:22px;border-radius:10px;font:14px/1.7 Consolas,monospace;white-space:pre}code{font-family:Consolas,monospace}p code{background:#ecf2fb;padding:2px 5px;border-radius:4px}nav{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0}nav a{font-size:14px;text-decoration:none;background:#fff;padding:8px 14px;border:1px solid var(--line);border-radius:8px}table{border-collapse:collapse;width:100%;font-size:15px}td,th{padding:12px;border-bottom:1px solid var(--line);text-align:left}.table-wrap{overflow:auto}.lab{padding:28px;background:white;border:1px solid var(--line);border-radius:16px}.lab h2{margin-top:0}.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}button,select{font:inherit;padding:9px 14px;border:1px solid #c7d3e5;border-radius:8px;background:#fff;color:var(--ink);cursor:pointer}button:hover{background:#edf3ff}button:disabled{opacity:.4;cursor:default}#play{background:var(--blue);color:white}.stage{min-height:260px;background:#f5f8fe;border-radius:12px;margin-top:22px;padding:24px;overflow:auto}.cells{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}.cell{background:white;border:2px solid #cbd7eb;border-radius:9px;padding:12px;min-width:65px;text-align:center;transition:transform .3s,background .3s}.cell.active{background:#d8e9ff;border-color:#2865cd;transform:translateY(-7px)}.cell small{display:block;font-size:12px}.cell b{font-size:24px}.grid{display:grid;gap:6px;grid-template-columns:repeat(7,minmax(38px,1fr));max-width:560px}.grid .cell{min-width:0;padding:5px;font-size:14px}.cell.block{background:#ffe2df;border-color:#c8473e}.stack{display:flex;flex-direction:column-reverse;gap:8px;max-width:420px}.stack .cell{text-align:left}.caption{padding:16px 0;min-height:75px;font-weight:600}#counter{font-size:14px;color:#526581}details{margin-top:20px}footer{font-size:14px;padding:32px 0;color:#53647d}@media(prefers-reduced-motion:reduce){*{transition:none!important}}@media print{header,nav,.lab{display:none}body{background:white}main{padding:0}article{padding:0}pre{white-space:pre-wrap}h2{break-after:avoid}}
+.tree{display:flex;justify-content:center;gap:12px;align-items:flex-start;flex-wrap:wrap}.branch{text-align:center}.children{display:flex;gap:10px;border-top:2px solid #8da9cc;margin-top:10px;padding-top:10px}.node{display:inline-block;background:#d8e9ff;padding:8px 16px;border:2px solid #2865cd;border-radius:8px}.bar{height:28px;background:#82afea;border-radius:6px;margin:10px 0}.chosen{background:#b8dbb6}svg{max-width:100%;height:auto}article table{display:block;overflow:auto}button:focus-visible,select:focus-visible{outline:3px solid #e89532}</style></head><body><header><small>LUOGU · C++17 · 第二章</small><h1>每一步选择，都要有理由。</h1><p>贪心、反例与证明 · 从部分背包到哈夫曼编码。先理解知识点，再学完整例题。</p></header><main><section class="lab"><h2>贪心算法放映室</h2><p>选一种演示，先手动推一步，再点“下一步”核对。例4/例6为已标明接口的教学模型。</p><div class="controls"><label for="scene">演示</label><select id="scene"><option value="bag">例1 部分背包</option><option value="queue">例2 排队接水与交换</option><option value="interval">例3 区间选择</option><option value="split">例4 分卷子教学拆分</option><option value="merge">例5 合并果子</option><option value="code">例6 哈夫曼树与编码</option><option value="candy">P3817 相邻约束修复</option><option value="delete">P1106 删数</option><option value="cheap">P1478/P1208 低成本优先</option><option value="road">P5019 正差分</option><option value="pair">P1094 双指针分组</option><option value="jump">P4995 高低交替</option><option value="teams">P4447 最短组优先</option><option value="king">P1080 国王游戏</option><option value="concat">P1012 拼数</option><option value="counter">0/1背包反例</option></select><button id="prev">上一步</button><button id="next">下一步</button><button id="play">自动播放</button><button id="reset">重置</button><span id="counter"></span></div><div id="stage" class="stage" role="img" aria-label="算法当前状态"></div><div id="caption" class="caption" aria-live="polite"></div></section><nav><a href="#book-toc">正文目录</a><a href="../README.md">学习记录</a></nav><article><p><a id="c0"></a></p>
+<h1>第二章：贪心与哈夫曼编码</h1>
+<!--TOC-->
+<h2 id="book-toc">目录</h2>
+<ul>
+<li><a href="#c1">题单范围说明</a></li>
+<li><a href="#c2">图片节点覆盖表</a></li>
+<li><a href="#c3">入门：贪心到底在做什么</a></li>
+<li><a href="#c4">K01 贪心算法</a></li>
+<li><a href="#c5">K02 贪心选择性质与最优子结构</a></li>
+<li><a href="#c6">K03 反证法与交换论证</a></li>
+<li><a href="#c7">K04 举出反例证伪贪心</a></li>
+<li><a href="#c8">K05 大胆假设，小心求证：相邻交换</a></li>
+<li><a href="#c9">K06 数学归纳法证明区间贪心</a></li>
+<li><a href="#c10">K07 小根堆与动态维护最小值</a></li>
+<li><a href="#c11">K08 哈夫曼树的构建与带权路径长度</a></li>
+<li><a href="#c12">K09 哈夫曼编码与前缀码</a></li>
+<li><a href="#c13">K10 证明与验证形成闭环</a></li>
+<li><a href="#c14">例1：部分背包问题（P2240）</a></li>
+<li><a href="#c15">例2：排队接水（P1223）</a></li>
+<li><a href="#c16">例3：凌乱的yyy（P1803）</a></li>
+<li><a href="#c17">例4：分卷子（拆分教学模型，原题待核对）</a></li>
+<li><a href="#c18">例5：合并果子（P1090）</a></li>
+<li><a href="#c19">例6：哈夫曼编码的制定（教学模型，原题待核对）</a></li>
+<li><a href="#c20">图解：同一棵树，两个解释</a></li>
+<li><a href="#c21">题单实战：截图补充的十道题</a></li>
+<li><a href="#c22">P3817 小 A 的糖果</a></li>
+<li><a href="#c23">P1106 删数问题</a></li>
+<li><a href="#c24">P1478 陶陶摘苹果（升级版）</a></li>
+<li><a href="#c25">P5019 铺设道路</a></li>
+<li><a href="#c26">P1208 混合牛奶</a></li>
+<li><a href="#c27">P1094 纪念品分组</a></li>
+<li><a href="#c28">P4995 跳跳！</a></li>
+<li><a href="#c29">P4447 分组</a></li>
+<li><a href="#c30">P1080 国王游戏</a></li>
+<li><a href="#c31">P1012 拼数</a></li>
+<li><a href="#c32">自测与复习</a></li>
+<li><a href="#c33">来源与适用范围</a></li>
+</ul>
+<!--/TOC-->
+
+<p>先学概念、再看证明、最后做题。包含截图14题与原图的两个补充教学模型。代码沿用你的习惯：bits/stdc++.h、int 宏、signed main、大括号独占一行、普通数组与循环，保留 cin/cout。函数片段默认放在同样的头文件、宏定义和 using 声明之后。</p>
+<p>图片给出了六个例题名称；可核对的四题使用洛谷原题。图片没有“分卷子”和“哈夫曼编码的制定”的完整题面，以下为这两例提供明确标记的教学模型，讲透对应知识，但不声称是书中原题或可直接提交的题解。收到原题后可补齐准确输入输出。</p>
+<p><a id="c1"></a></p>
+<h2>题单范围说明</h2>
+<p>本章同时覆盖两张图片：原思维导图中的证明与哈夫曼知识，以及后补截图的14道洛谷题。分卷子、编码制定作为补充教学模型保留，并非题单里缺失的题号。</p>
+<p><a id="c2"></a></p>
+<h2>图片节点覆盖表</h2>
+<table>
+<thead>
+<tr>
+<th>图片节点</th>
+<th>对应知识点与例题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>贪心与证明</td>
+<td>K01 贪心、K02 性质、K03 交换与反证</td>
+</tr>
+<tr>
+<td>部分背包：反证法证明贪心</td>
+<td>K03 与例1</td>
+</tr>
+<tr>
+<td>部分背包：举反例证伪贪心</td>
+<td>K04 与例1的 0/1 反例</td>
+</tr>
+<tr>
+<td>排队接水：大胆假设，小心求证</td>
+<td>K05 与例2</td>
+</tr>
+<tr>
+<td>凌乱的yyy：数学归纳法证明贪心</td>
+<td>K06 与例3</td>
+</tr>
+<tr>
+<td>分卷子</td>
+<td>例4：明确假设的拆分教学模型</td>
+</tr>
+<tr>
+<td>合并果子、哈夫曼树的构建</td>
+<td>K07、K08 与例5</td>
+</tr>
+<tr>
+<td>哈夫曼编码、编码的制定、经典贪心案例</td>
+<td>K09、K10 与例6</td>
+</tr>
+</tbody>
+</table>
+<p><a id="c3"></a></p>
+<h2>入门：贪心到底在做什么</h2>
+<p>想象给一条队伍安排接水顺序，当前只决定“下一个让谁接”。贪心每次依据某条规则作一个局部选择，然后把剩余问题继续交给同一条规则。代码往往短，难点在于证明：这一步不会牺牲后面的最优答案。</p>
+<pre><code class="language-text">先读目标 → 提出规则 → 找反例 → 证明可安全选择 → 实现 → 小规模对拍
+                     ↑                          |
+                     └──── 发现问题就修改规则 ───┘
+</code></pre>
+<p>与上一章对照：递推/递归描述计算组织方式，贪心描述决策策略；贪心也可以循环或递归实现。不能把“有排序”当成“就是正确的贪心”。
+<a id="c4"></a></p>
+<h2>K01 贪心算法</h2>
+<h3>概念</h3>
+<p>在每一步按固定策略选当前最有利的可行方案，通常不撤销选择。局部最优是当前一步好，全局最优是最终目标最好，二者不能画等号。</p>
+<h3>原理</h3>
+<p>正确策略必须保留某个最优解的可能性。比如相同代价下先选择收益高的物品，有时安全；但带重量限制时只看总收益可能浪费容量。先明确优化目标和约束。</p>
+<h3>C++ 实现</h3>
+<p>最简单的安全例子：预算 k 次选择，每个物品成本相同、收益非负，取最大的 k 个。</p>
+<pre><code class="language-cpp">sort(a+1,a+n+1,greater&lt;int&gt;());
+int ans=0;
+for(int i=1;i&lt;=min(k,n);i++)
+    ans+=a[i];
+</code></pre>
+<h3>作用与使用场景</h3>
+<p>资源调度、可分割资源、某些区间选择、最优合并。若当前选择会改变后续约束，必须证明安全，不能看到最大/最小就套贪心。</p>
+<p><a id="c5"></a></p>
+<h2>K02 贪心选择性质与最优子结构</h2>
+<h3>概念</h3>
+<p>贪心选择性质：存在一个最优解包含算法的首个选择。最优子结构：首个选择固定后，余下部分必须是相应剩余问题的最优解。</p>
+<h3>原理</h3>
+<p>两个条件共同连接“当前选择”与“整题正确”。最优子结构本身不够：0/1 背包也有最优子结构，但按单位价值选通常错误。</p>
+<h3>C++ 实现</h3>
+<p>实现时让变量准确表示剩余问题，例如区间选择：</p>
+<pre><code class="language-cpp">if(a[i].l&gt;=last)
+{
+    ans++;
+    last=a[i].r;
+}
+</code></pre>
+<p>last 是已经选择的最后结束时间，之后只考虑可衔接区间。完整实现见 P1803。</p>
+<h3>作用与使用场景</h3>
+<p>用来搭建证明和检查状态。选完一个区间后，剩余目标仍是最大化后续区间个数；若变成总收益最大，则模型改变，不能直接继承结论。</p>
+<p><a id="c6"></a></p>
+<h2>K03 反证法与交换论证</h2>
+<h3>概念</h3>
+<p>反证法是假设结论不成立，推出矛盾；交换论证是把一个最优解中与贪心不同的选择交换成贪心选择，同时不让目标变差。交换是构造手段，反证是逻辑框架。</p>
+<h3>原理</h3>
+<p>部分背包按单位价值从大到小取。若某最优解先取了低密度物品、却没有取满可用高密度物品，就交换相同重量 δ，价值增加 δ×(高密度-低密度)&gt;0，与最优矛盾。密度相同时交换不变差，说明存在遵守该顺序的最优解。</p>
+<h3>C++ 实现</h3>
+<p>不要用整数除法比较密度，正重量下交叉相乘：</p>
+<pre><code class="language-cpp">bool cmp(node x,node y)
+{
+    return x.v*y.m&gt;y.v*x.m;
+}
+</code></pre>
+<p>本题范围下乘积安全；更大范围要另检查溢出。相等时返回 false 符合排序要求，不能写 &gt;=。</p>
+<h3>作用与使用场景</h3>
+<p>可分割背包、相邻交换排序、树上叶子交换。证明要写明交换后依然可行，以及其他部分的代价为何不变；“显然交换更好”不能代替计算。</p>
+<p><a id="c7"></a></p>
+<h2>K04 举出反例证伪贪心</h2>
+<h3>概念</h3>
+<p>只需一个合法输入使策略得不到最优解，就能否定“该策略对所有输入都正确”。许多样例通过只能支持猜想，不能证明它。</p>
+<h3>原理</h3>
+<p>容量 50，物品(重量,价值)为(10,60)、(20,100)、(30,120)。可分割时密度优先得240；不可分割时同策略选前两件得160，但后两件得220。失败原因是不可分割导致容量碎片。</p>
+<h3>C++ 实现</h3>
+<p>可用 0/1 子集枚举作为小数据参照：</p>
+<pre><code class="language-cpp">int best=0;
+for(int s=0;s&lt;(1LL&lt;&lt;n);s++)
+{
+    int weight=0,value=0;
+    for(int i=0;i&lt;n;i++)
+    {
+        if((s&gt;&gt;i)&amp;1)
+        {
+            weight+=m[i];
+            value+=v[i];
+        }
+    }
+    if(weight&lt;=t) best=max(best,value);
+}
+</code></pre>
+<p>仅用于 n&lt;=20 的小规模验证，时间 O(n×2^n)。</p>
+<h3>作用与使用场景</h3>
+<p>检查“价值最大优先”“最轻优先”“最短区间优先”等直觉。优先找极端值、容量刚好满、并列与长短相互冲突的输入。对拍发现错误有力，对拍未发现错误仍需证明。</p>
+<p><a id="c8"></a></p>
+<h2>K05 大胆假设，小心求证：相邻交换</h2>
+<h3>概念</h3>
+<p>先猜一个规则，再精确计算交换的收益。排队接水的目标是等待时间，不包括自己接水时间。</p>
+<h3>原理</h3>
+<p>相邻两人接水时间 x&gt;y，之前累计时间为 P。原等待之和 P+(P+x)=2P+x，交换后为2P+y，减少x-y&gt;0。后面人开始时间不变，因为 x+y 不变。消去全部逆序后为升序；相同时间按题目要求编号升序。</p>
+<h3>C++ 实现</h3>
+<p>累计时间 now 是当前人真正等待的时间：</p>
+<pre><code class="language-cpp">int now=0,sum=0;
+for(int i=1;i&lt;=n;i++)
+{
+    sum+=now;
+    now+=a[i].t;
+}
+cout&lt;&lt;fixed&lt;&lt;setprecision(2)&lt;&lt;1.0*sum/n;
+</code></pre>
+<h3>作用与使用场景</h3>
+<p>单机器、所有任务同时到达、最小化总等待/完成时间的等权模型。有到达时间、不同优先权或多个水龙头时要重新建模。sort O(n log n)，扫描 O(n)；sum 用64位整数。</p>
+<p><a id="c9"></a></p>
+<h2>K06 数学归纳法证明区间贪心</h2>
+<h3>概念</h3>
+<p>归纳法分基础情况和归纳步骤。区间调度选结束最早的可行区间，而不是开始最早或持续最短。</p>
+<h3>原理</h3>
+<p>基础：没有区间或只有一个时正确。归纳：令 g 为最早结束区间，任一最优解首区间为 o，有 end(g)&lt;=end(o)。用 g 替换 o，之后原来能接上的区间仍可接上，数量不减。选 g 后剩下区间更少，是同型问题，依归纳假设余下也最优。</p>
+<h3>C++ 实现</h3>
+<p>按结束时间排序，扫描一次：</p>
+<pre><code class="language-cpp">int last=-1,ans=0;
+for(int i=1;i&lt;=n;i++)
+{
+    if(a[i].l&gt;=last)
+    {
+        ans++;
+        last=a[i].r;
+    }
+}
+</code></pre>
+<p>P1803 时间非负，因此 last=-1 安全；允许负时间时需改初值。</p>
+<h3>作用与使用场景</h3>
+<p>不带权、要求最多个数的区间选择；端点衔接允许相等。带权区间不能只选结束最早，通常要动态规划。时间 O(n log n)，空间 O(n)；把 &gt;= 写成 &gt; 会漏掉紧接的比赛。</p>
+<p><a id="c10"></a></p>
+<h2>K07 小根堆与动态维护最小值</h2>
+<h3>概念</h3>
+<p>堆是一种能快速取极值的容器。小根堆每次 top 返回最小元素，pop 删除，push 插入新元素。</p>
+<h3>原理</h3>
+<p>合并后产生的新堆也会参与下一次选择。只在开始排序一次、以后顺序取两项是错误的：新元素必须重新放回候选集合。</p>
+<h3>C++ 实现</h3>
+<pre><code class="language-cpp">priority_queue&lt;int,vector&lt;int&gt;,greater&lt;int&gt;&gt; q;
+q.push(3);
+q.push(8);
+int x=q.top(); // x=3，查看但未删除
+q.pop();       // 删除3
+</code></pre>
+<p>模板中的 vector<int> 是堆底层存储，greater<int> 使最小值在顶部；默认 priority_queue<int> 则是大根堆。</p>
+<h3>作用与使用场景</h3>
+<p>反复插入和取最小值的调度、合并、哈夫曼构建。top O(1)，push/pop O(log n)，共 n-1 次合并，所以总 O(n log n)，空间 O(n)。空堆不能 top/pop。</p>
+<p><a id="c11"></a></p>
+<h2>K08 哈夫曼树的构建与带权路径长度</h2>
+<h3>概念</h3>
+<p>叶子代表原始对象，叶权为频次或重量，内部节点权为孩子权之和。叶深度按边数计算，WPL=Σ(叶权×叶深度)，目标使它最小。</p>
+<h3>原理</h3>
+<p>每次合并两小权 x,y，新节点权 x+y。一个叶子每上升一层就多被计算一次，所以合并代价总和等于 WPL。最优满二叉树可选最深的一对兄弟叶，把最小两权交换到这里不增加WPL：小权应占更大深度。合并成一叶后问题缩小，归纳证明反复取两小安全。</p>
+<h3>C++ 实现</h3>
+<pre><code class="language-cpp">int ans=0;
+while(q.size()&gt;1)
+{
+    int x=q.top();
+    q.pop();
+    int y=q.top();
+    q.pop();
+    ans+=x+y;
+    q.push(x+y);
+}
+</code></pre>
+<p>只求最小代价无需建树；要生成编码必须保留左右孩子，见例6。</p>
+<h3>作用与使用场景</h3>
+<p>最优二元合并、文件合并、频次编码。证明依赖非负权、任意两堆可合并且代价等于两权之和；限制相邻合并或改变代价函数后不能照搬。n=1 时无需合并，WPL为0。</p>
+<p><a id="c12"></a></p>
+<h2>K09 哈夫曼编码与前缀码</h2>
+<h3>概念</h3>
+<p>编码把符号映射到二进制串。前缀码要求没有一个符号的码字是另一个码字的前缀，因此可从左到右即时解码。</p>
+<h3>原理</h3>
+<p>把符号放在树叶上，左边标0、右边标1，根到叶路径为码字。叶子不可能是另一叶的祖先，因此天然无前缀冲突。总编码位数=Σ频次×码长= WPL；最小化WPL就最小化已知频次下的二元前缀编码长度。</p>
+<h3>C++ 实现</h3>
+<p>生成过程是上一章学过的树形递归：</p>
+<pre><code class="language-cpp">void dfs(int u,string s)
+{
+    if(ls[u]==0&amp;&amp;rs[u]==0)
+    {
+        code[u]=s;
+        return;
+    }
+    dfs(ls[u],s+'0');
+    dfs(rs[u],s+'1');
+}
+</code></pre>
+<h3>作用与使用场景</h3>
+<p>已知符号频次的无损编码。左右标记可交换、相等权也可有不同树，所以最优编码未必唯一。单符号模型本章允许空码，需外部给定符号个数；实际格式若强制至少一位可约定0，此时输出长度为频次，不能仍称实际位数为0。</p>
+<p><a id="c13"></a></p>
+<h2>K10 证明与验证形成闭环</h2>
+<h3>概念</h3>
+<p>正确实现、数学证明、测试是不同任务：证明解释所有合法输入为何正确；测试帮助发现实现和推理里的错误。</p>
+<h3>原理</h3>
+<p>对贪心的证明可以按“找最优解 → 交换成贪心首选 → 剩余问题归纳”组织。验证器则对小规模枚举全部选择、排列或合并方式，检查贪心与最优值一致。</p>
+<h3>C++ 实现</h3>
+<p>在正式程序外用小数据验证，不把暴力写进大规模解法。例如合并权1、2、9：先合1+2，再合3+9，总代价3+12=15；先合2+9则为11+12=23。代码见完整例5与 verify.py。</p>
+<h3>作用与使用场景</h3>
+<p>遇到新贪心题先证伪再证明；测试包含n=1、全相等、端点相接、容量不足及单符号。不要用一个样例通过代替正确性证明。</p>
+<p><a id="c14"></a></p>
+<h2>例1：部分背包问题（P2240）</h2>
+<p><a href="https://www.luogu.com.cn/problem/P2240">洛谷原题</a></p>
+<p>容量50，(10,60)、(20,100)、(30,120)，先装前两件，再装第三件的20/30，答案240.00。注意真正的可分割条件；不能把整数除法所得密度用于排序。</p>
+<h3>完整 C++17 程序</h3>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+
+struct node
+{
+    int m,v;
+}a[105];
+
+bool cmp(node x,node y)
+{
+    return x.v*y.m&gt;y.v*x.m;
+}
+
+signed main()
+{
+    int n,t;
+    cin&gt;&gt;n&gt;&gt;t;
+    for(int i=1;i&lt;=n;i++) cin&gt;&gt;a[i].m&gt;&gt;a[i].v;
+    sort(a+1,a+n+1,cmp);
+
+    double ans=0;
+    for(int i=1;i&lt;=n&amp;&amp;t&gt;0;i++)
+    {
+        int take=min(t,a[i].m);
+        ans+=1.0*take*a[i].v/a[i].m;
+        t-=take;
+    }
+
+    cout&lt;&lt;fixed&lt;&lt;setprecision(2)&lt;&lt;ans&lt;&lt;'\n';
+    return 0;
+}
+</code></pre>
+<p><a id="c15"></a></p>
+<h2>例2：排队接水（P1223）</h2>
+<p><a href="https://www.luogu.com.cn/problem/P1223">洛谷原题</a></p>
+<p>时间3、1、2，顺序编号2、3、1；等待分别0、1、3，总和4，平均1.33。若先now+=t再sum+=now，就把自己的接水时间也算进去了。</p>
+<h3>完整 C++17 程序</h3>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+
+struct node
+{
+    int t,id;
+}a[1005];
+
+bool cmp(node x,node y)
+{
+    if(x.t!=y.t) return x.t&lt;y.t;
+    return x.id&lt;y.id;
+}
+
+signed main()
+{
+    int n;
+    cin&gt;&gt;n;
+    for(int i=1;i&lt;=n;i++)
+    {
+        cin&gt;&gt;a[i].t;
+        a[i].id=i;
+    }
+    sort(a+1,a+n+1,cmp);
+
+    int now=0,sum=0;
+    for(int i=1;i&lt;=n;i++)
+    {
+        cout&lt;&lt;a[i].id&lt;&lt;(i==n?'\n':' ');
+        sum+=now;
+        now+=a[i].t;
+    }
+
+    cout&lt;&lt;fixed&lt;&lt;setprecision(2)&lt;&lt;1.0*sum/n&lt;&lt;'\n';
+    return 0;
+}
+</code></pre>
+<p><a id="c16"></a></p>
+<h2>例3：凌乱的yyy（P1803）</h2>
+<p><a href="https://www.luogu.com.cn/problem/P1803">洛谷原题</a></p>
+<p>区间[0,3)、[1,2)、[2,4)、[4,5)，选后三个得3。开始最早的[0,3)会挤掉两个可衔接区间。这里用半开区间理解端点衔接。最短优先也可能错：[0,3)、[3,6)、[2,4)，最短[2,4)只能得1，另两段能得2。</p>
+<h3>完整 C++17 程序</h3>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+
+struct node
+{
+    int l,r;
+}a[1000005];
+
+bool cmp(node x,node y)
+{
+    if(x.r!=y.r) return x.r&lt;y.r;
+    return x.l&lt;y.l;
+}
+
+signed main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+
+    int n;
+    cin&gt;&gt;n;
+    for(int i=1;i&lt;=n;i++) cin&gt;&gt;a[i].l&gt;&gt;a[i].r;
+    sort(a+1,a+n+1,cmp);
+
+    int last=-1,ans=0;
+    for(int i=1;i&lt;=n;i++)
+    {
+        if(a[i].l&gt;=last)
+        {
+            ans++;
+            last=a[i].r;
+        }
+    }
+
+    cout&lt;&lt;ans&lt;&lt;'\n';
+    return 0;
+}
+</code></pre>
+<p><a id="c17"></a></p>
+<h2>例4：分卷子（拆分教学模型，原题待核对）</h2>
+<p>明确教学假设：有n个班，各需要给定份数的卷子；从整叠开始，每次把一叠拆成两叠，代价为该叠张数，最终每班得到所需张数，最小化总代价。逆向看就是任意两堆合并，故与最优合并相同。例1、2、9份可先分3和9，再分1和2，代价12+3=15。本模型不保证等同书中“分卷子”，图片没有给出实际发放规则；实际若有顺序/相邻约束，算法可能改变。教学输入n和n个正整数，输出最小代价。</p>
+<h3>完整 C++17 程序</h3>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+
+priority_queue&lt;int,vector&lt;int&gt;,greater&lt;int&gt;&gt; q;
+
+signed main()
+{
+    int n,x;
+    cin&gt;&gt;n;
+    for(int i=1;i&lt;=n;i++)
+    {
+        cin&gt;&gt;x;
+        q.push(x);
+    }
+
+    int ans=0;
+    while(q.size()&gt;1)
+    {
+        int a=q.top();
+        q.pop();
+        int b=q.top();
+        q.pop();
+
+        int c=a+b;
+        ans+=c;
+        q.push(c);
+    }
+
+    cout&lt;&lt;ans&lt;&lt;'\n';
+    return 0;
+}
+</code></pre>
+<p><a id="c18"></a></p>
+<h2>例5：合并果子（P1090）</h2>
+<p><a href="https://www.luogu.com.cn/problem/P1090">洛谷原题</a></p>
+<p>权1、2、9：小根堆[1,2,9]→合1和2，花3→[3,9]→合3和9，花12→[12]，总15。新堆必须参与后续选择。对应树叶1和2深度2，9深度1，WPL=1×2+2×2+9=15。</p>
+<h3>完整 C++17 程序</h3>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+
+priority_queue&lt;int,vector&lt;int&gt;,greater&lt;int&gt;&gt; q;
+
+signed main()
+{
+    int n,x;
+    cin&gt;&gt;n;
+    for(int i=1;i&lt;=n;i++)
+    {
+        cin&gt;&gt;x;
+        q.push(x);
+    }
+
+    int ans=0;
+    while(q.size()&gt;1)
+    {
+        int a=q.top();
+        q.pop();
+        int b=q.top();
+        q.pop();
+
+        int c=a+b;
+        ans+=c;
+        q.push(c);
+    }
+
+    cout&lt;&lt;ans&lt;&lt;'\n';
+    return 0;
+}
+</code></pre>
+<p><a id="c19"></a></p>
+<h2>例6：哈夫曼编码的制定（教学模型，原题待核对）</h2>
+<p>明确教学接口：读n和n个正频次（n&lt;=1000，单项&lt;=10^9），按输入编号输出码字，并先输出最小WPL。权1、2、9可编码00、01、1，WPL=15。构造时节点数至多2n-1，数组开2005；pair的第二项节点编号仅用于相等权稳定取出，不是新的贪心标准。单符号输出(empty)，表示空码，并给出WPL=0；此模型假定解码端知道符号个数。若书中要求0编码，应按其接口修改。本例不冒充某个未确认洛谷题号。</p>
+<h3>完整 C++17 程序</h3>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+
+// 教学输入：n，然后 n 个正整数频次，1&lt;=n&lt;=1000。
+// 输出：最小 WPL，然后按原编号输出编码；不是未确认原题的提交格式。
+int w[2005],ls[2005],rs[2005];
+string code[1005];
+priority_queue&lt;pair&lt;int,int&gt;,vector&lt;pair&lt;int,int&gt;&gt;,greater&lt;pair&lt;int,int&gt;&gt;&gt; q;
+
+void dfs(int u,string s)
+{
+    if(ls[u]==0&amp;&amp;rs[u]==0)
+    {
+        code[u]=s;
+        return;
+    }
+    dfs(ls[u],s+'0');
+    dfs(rs[u],s+'1');
+}
+
+signed main()
+{
+    int n;
+    cin&gt;&gt;n;
+    for(int i=1;i&lt;=n;i++)
+    {
+        cin&gt;&gt;w[i];
+        q.push({w[i],i});
+    }
+
+    int tot=n,ans=0;
+    while(q.size()&gt;1)
+    {
+        int a=q.top().second;
+        q.pop();
+        int b=q.top().second;
+        q.pop();
+
+        tot++;
+        ls[tot]=a;
+        rs[tot]=b;
+        w[tot]=w[a]+w[b];
+        ans+=w[tot];
+        q.push({w[tot],tot});
+    }
+
+    dfs(q.top().second,&quot;&quot;);
+    cout&lt;&lt;ans&lt;&lt;'\n';
+    for(int i=1;i&lt;=n;i++)
+    {
+        if(n==1) cout&lt;&lt;&quot;(empty)\n&quot;;
+        else cout&lt;&lt;code[i]&lt;&lt;'\n';
+    }
+    return 0;
+}
+</code></pre>
+<p><a id="c20"></a></p>
+<h2>图解：同一棵树，两个解释</h2>
+<pre><code class="language-text">            12                   合并最后一步花12
+           /  \
+          3    9                 第一步合并1和2花3
+         / \
+        1   2
+
+叶权×深度：1×2 + 2×2 + 9×1 = 15
+内部权之和：3 + 12 = 15
+取左0右1：1→00，2→01，9→1
+</code></pre>
+<p><a id="c21"></a></p>
+<h1>题单实战：截图补充的十道题</h1>
+<p>这十题与前面的P2240、P1223、P1803、P1090合起来，完整覆盖截图14题。以下各题均已核对洛谷原页；先读概念和证明，再看实现。</p>
+<p><a id="c22"></a></p>
+<h2>P3817 小 A 的糖果</h2>
+<p><a href="https://www.luogu.com.cn/problem/P3817">洛谷原题</a></p>
+<h3>概念与策略</h3>
+<p>从左到右维护相邻盒子之和不超过x，只删除必要数量。</p>
+<h3>原理与正确性</h3>
+<p>先把a[1]压到x以内。处理i时至少要删除相邻超出的 d=a[i-1]+a[i]-x。优先从右盒a[i]删：删除左盒与右盒都能修复当前约束，但删右盒还能给下一对留下空间，不会伤害已处理的前缀；在最优解中把相应删除移到右侧不增加删除总数，因此安全。</p>
+<h3>完整 C++17 实现</h3>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+
+int a[100005];
+signed main()
+{
+    int n,x,ans=0;
+    cin&gt;&gt;n&gt;&gt;x;
+    for(int i=1;i&lt;=n;i++) cin&gt;&gt;a[i];
+    if(a[1]&gt;x)
+    {
+        ans=a[1]-x;
+        a[1]=x;
+    }
+    for(int i=2;i&lt;=n;i++)
+    {
+        int d=max(0LL,a[i-1]+a[i]-x);
+        a[i]-=d;
+        ans+=d;
+    }
+    cout&lt;&lt;ans&lt;&lt;'\n';
+    return 0;
+}
+</code></pre>
+<h3>作用、使用场景与易错点</h3>
+<p>适合相邻上界、前缀已固定的局部修复。a[1]先压到x，保证后续d不会大于a[i]，不会减出负数；答案可能超过32位。例x=3，盒子4,2,3，先删首盒1，再删第二盒2，总3。时间O(n)，空间O(n)。</p>
+<p><a id="c23"></a></p>
+<h2>P1106 删数问题</h2>
+<p><a href="https://www.luogu.com.cn/problem/P1106">洛谷原题</a></p>
+<h3>概念与策略</h3>
+<p>保留原顺序删除k位，使剩余整数最小。优先删掉首个大于后一位的数字。</p>
+<h3>原理与正确性</h3>
+<p>在所有剩余长度相同的数串中，首个不同位决定大小。若出现相邻下降a&gt;b，删a能让更小的b尽早到高位，比删后面的位更优；重复这一步。若整串非降，就从末尾删，保留较小前缀。本题仅250位，采用直观O(kL)版本。</p>
+<h3>完整 C++17 实现</h3>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+
+signed main()
+{
+    string s;
+    int k;
+    cin&gt;&gt;s&gt;&gt;k;
+    while(k--)
+    {
+        int pos=0;
+        while(pos+1&lt;(int)s.size()&amp;&amp;s[pos]&lt;=s[pos+1]) pos++;
+        s.erase(pos,1);
+    }
+    int pos=0;
+    while(pos&lt;(int)s.size()&amp;&amp;s[pos]=='0') pos++;
+    if(pos==(int)s.size()) cout&lt;&lt;0;
+    else cout&lt;&lt;s.substr(pos);
+    cout&lt;&lt;'\n';
+    return 0;
+}
+</code></pre>
+<h3>作用、使用场景与易错点</h3>
+<p>字符串高位优先贪心。例178543删4位得13；1000删1位得0。erase删一位，不能转long long导致溢出。此版本O(kL)、空间O(L)；大规模可用单调栈O(L)，本题不必为短代码引入复杂结构。</p>
+<p><a id="c24"></a></p>
+<h2>P1478 陶陶摘苹果（升级版）</h2>
+<p><a href="https://www.luogu.com.cn/problem/P1478">洛谷原题</a></p>
+<h3>概念与策略</h3>
+<p>先过滤够不到的苹果，再按力气成本升序购买“每件收益都是1”的物品。</p>
+<h3>原理与正确性</h3>
+<p>同样摘k个苹果，最便宜k个的总力气不大于任意其他k个。交换掉更贵的已选苹果，不减少数量且不会增加力气，因此成本升序最优。可达性必须先判断，不能把够不到但便宜的苹果算进去。</p>
+<h3>完整 C++17 实现</h3>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+
+int cost[5005];
+signed main()
+{
+    int n,s,a,b,cnt=0;
+    cin&gt;&gt;n&gt;&gt;s&gt;&gt;a&gt;&gt;b;
+    for(int i=1;i&lt;=n;i++)
+    {
+        int x,y;
+        cin&gt;&gt;x&gt;&gt;y;
+        if(x&lt;=a+b) cost[++cnt]=y;
+    }
+    sort(cost+1,cost+cnt+1);
+    int ans=0;
+    for(int i=1;i&lt;=cnt;i++)
+    {
+        if(cost[i]&gt;s) break;
+        s-=cost[i];
+        ans++;
+    }
+    cout&lt;&lt;ans&lt;&lt;'\n';
+    return 0;
+}
+</code></pre>
+<h3>作用、使用场景与易错点</h3>
+<p>适合相同收益下最大化数量；收益不同就不能只按成本排序。高度等于a+b可以摘，力气刚好用完也可以。时间O(n log n)，空间O(n)。</p>
+<p><a id="c25"></a></p>
+<h2>P5019 铺设道路</h2>
+<p><a href="https://www.luogu.com.cn/problem/P5019">洛谷原题</a></p>
+<h3>概念与策略</h3>
+<p>把深度直方图看成由若干条连续水平线段叠成，每次施工对应减去一条线段。</p>
+<h3>原理与正确性</h3>
+<p>左端需要d[1]层；扫描到i时，若d[i]&gt;d[i-1]，左边已有线段最多延伸d[i-1]层，至少新开差值条。若下降，只需结束若干条，无需新开。这既给出不可突破的下界，又能按水平线段达到它，所以答案Σmax(0,d[i]-d[i-1])，d[0]=0。</p>
+<h3>完整 C++17 实现</h3>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+
+signed main()
+{
+    int n,last=0,ans=0;
+    cin&gt;&gt;n;
+    for(int i=1;i&lt;=n;i++)
+    {
+        int x;
+        cin&gt;&gt;x;
+        if(x&gt;last) ans+=x-last;
+        last=x;
+    }
+    cout&lt;&lt;ans&lt;&lt;'\n';
+    return 0;
+}
+</code></pre>
+<h3>作用、使用场景与易错点</h3>
+<p>差分、区间加减与构造下界。例2,3,1,2贡献2+1+0+1=4，零深度把水平段截断。不要加绝对差，也不用一天一天模拟。时间O(n)，额外空间O(1)。</p>
+<p><a id="c26"></a></p>
+<h2>P1208 混合牛奶</h2>
+<p><a href="https://www.luogu.com.cn/problem/P1208">洛谷原题</a></p>
+<h3>概念与策略</h3>
+<p>有限供应下按单价升序采购，直到需求满足。</p>
+<h3>原理与正确性</h3>
+<p>若买了贵奶而便宜供应还有剩余，可等量交换，每单位费用下降且需求不变；故存在便宜先买的最优解。供应按整数单位买，本题每单位相同且可买部分产量，不是0/1背包。</p>
+<h3>完整 C++17 实现</h3>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+
+struct node
+{
+    int p,a;
+}a[5005];
+bool cmp(node x,node y)
+{
+    return x.p&lt;y.p;
+}
+signed main()
+{
+    int need,m,ans=0;
+    cin&gt;&gt;need&gt;&gt;m;
+    for(int i=1;i&lt;=m;i++) cin&gt;&gt;a[i].p&gt;&gt;a[i].a;
+    sort(a+1,a+m+1,cmp);
+    for(int i=1;i&lt;=m&amp;&amp;need&gt;0;i++)
+    {
+        int buy=min(need,a[i].a);
+        ans+=buy*a[i].p;
+        need-=buy;
+    }
+    cout&lt;&lt;ans&lt;&lt;'\n';
+    return 0;
+}
+</code></pre>
+<h3>作用、使用场景与易错点</h3>
+<p>适合货物同质、供应有限、单位价格固定的采购；不同质量或运费门槛需重新证明。需求可以为0，供应总量按题意保证足够。时间O(m log m)，空间O(m)。</p>
+<p><a id="c27"></a></p>
+<h2>P1094 纪念品分组</h2>
+<p><a href="https://www.luogu.com.cn/problem/P1094">洛谷原题</a></p>
+<h3>概念与策略</h3>
+<p>排序后用双指针，每次为最重物品决定单独一组或与最轻者配对。</p>
+<h3>原理与正确性</h3>
+<p>若最轻+最重仍超上限，最重与任何人都不能同组，必须单独。否则可让最重与最轻配对：若原解二者各与别人配对，把它们换成一对，剩余两件也能成对，因为最重不小于它们，新的剩余对不会超出原来与最重配对的和；有单独者时交换也不增加组数。</p>
+<h3>完整 C++17 实现</h3>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+
+int a[30005];
+signed main()
+{
+    int w,n;
+    cin&gt;&gt;w&gt;&gt;n;
+    for(int i=1;i&lt;=n;i++) cin&gt;&gt;a[i];
+    sort(a+1,a+n+1);
+    int l=1,r=n,ans=0;
+    while(l&lt;=r)
+    {
+        if(l&lt;r&amp;&amp;a[l]+a[r]&lt;=w) l++;
+        r--;
+        ans++;
+    }
+    cout&lt;&lt;ans&lt;&lt;'\n';
+    return 0;
+}
+</code></pre>
+<h3>作用、使用场景与易错点</h3>
+<p>仅适用于每组最多两件。若最多三件，双指针策略不能原样套用。l==r只剩一件算一组。时间O(n log n)，空间O(n)。</p>
+<p><a id="c28"></a></p>
+<h2>P4995 跳跳！</h2>
+<p><a href="https://www.luogu.com.cn/problem/P4995">洛谷原题</a></p>
+<h3>概念与策略</h3>
+<p>从地面0出发，交替跳剩余最高、最低石头，让大高度差反复出现，目标是最大平方差和。</p>
+<h3>原理与正确性</h3>
+<p>关键不是“选择最近”，而是让路径高低交错。对a&lt;=b&lt;=c&lt;=d有(d-a)^2+(c-b)^2-[(c-a)^2+(d-b)^2]=2(d-c)(b-a)&gt;=0，说明把高低端交错配对不会降低收益；对路径可通过交换并反转中间子段保持内部边代价，将端点逐步整理为高低交替。地面是全局最低且固定起点，规范最优顺序可取最大、最小、次大、次小……。这一性质依赖平方距离和正高度，不是任意代价函数通用的“最远优先”。</p>
+<h3>完整 C++17 实现</h3>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+
+int a[305];
+signed main()
+{
+    int n;
+    cin&gt;&gt;n;
+    for(int i=1;i&lt;=n;i++) cin&gt;&gt;a[i];
+    sort(a+1,a+n+1);
+    int l=1,r=n,now=0,ans=0;
+    bool high=true;
+    while(l&lt;=r)
+    {
+        int x;
+        if(high) x=a[r--];
+        else x=a[l++];
+        ans+=(x-now)*(x-now);
+        now=x;
+        high=!high;
+    }
+    cout&lt;&lt;ans&lt;&lt;'\n';
+    return 0;
+}
+</code></pre>
+<h3>作用、使用场景与易错点</h3>
+<p>极值交替、凸距离最大化的经典模型。例1,2,3：0→3→1→2得9+4+1=14；只升序得1+1+1=3。不能中途回地面，也不用最后回0。答案用64位。时间O(n log n)，空间O(n)，测试用全排列验证小规模。</p>
+<p><a id="c29"></a></p>
+<h2>P4447 分组</h2>
+<p><a href="https://www.luogu.com.cn/problem/P4447">洛谷原题</a></p>
+<h3>概念与策略</h3>
+<p>排序后将实力x接到末尾为x-1的组中；若可接多个，优先延长其中最短的组。目标是最大化最小组大小。</p>
+<h3>原理与正确性</h3>
+<p>同一末尾的组有相同未来可接实力，区别只是已有长度。把当前和未来可用延长机会优先分给短组，可以避免短组过早停下成为瓶颈；若一个方案把后续延长给了长组，却让短组停下，可交换这两组后续后缀，连续性不变且最小长度不减。无可接组才新建。用每个末尾值对应的小根堆保存组长。</p>
+<h3>完整 C++17 实现</h3>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+
+int a[100005];
+map&lt;int,priority_queue&lt;int,vector&lt;int&gt;,greater&lt;int&gt;&gt;&gt; q;
+signed main()
+{
+    int n;
+    cin&gt;&gt;n;
+    for(int i=1;i&lt;=n;i++) cin&gt;&gt;a[i];
+    sort(a+1,a+n+1);
+    for(int i=1;i&lt;=n;i++)
+    {
+        int x=a[i],len=0;
+        if(!q[x-1].empty())
+        {
+            len=q[x-1].top();
+            q[x-1].pop();
+        }
+        q[x].push(len+1);
+    }
+    int ans=n;
+    for(auto &amp;item:q)
+    {
+        if(!item.second.empty()) ans=min(ans,item.second.top());
+    }
+    cout&lt;&lt;ans&lt;&lt;'\n';
+    return 0;
+}
+</code></pre>
+<h3>作用、使用场景与易错点</h3>
+<p>此题的map按实力值查组，priority_queue的top取最短组；auto &amp;item只用于遍历每个“末尾值→小根堆”映射。重复实力不能放同组，负实力不能直接作为数组下标。例1,2,2,3形成两组[1,2]与[2,3]，最小长度2。时间O(n log n)，空间O(n)。</p>
+<p><a id="c30"></a></p>
+<h2>P1080 国王游戏</h2>
+<p><a href="https://www.luogu.com.cn/problem/P1080">洛谷原题</a></p>
+<h3>概念与策略</h3>
+<p>按每位大臣左右手乘积a×b升序排序；维护前面所有左手数乘积，先除当前右手计算奖赏，再乘当前左手。乘积需要高精度。</p>
+<h3>原理与正确性</h3>
+<p>设当前前缀积P，相邻i,j的乘积满足ai<em>bi&lt;=aj</em>bj。顺序i,j的两项为floor(P/bi)、floor(P<em>ai/bj)；反序j,i包含floor(P</em>aj/bi)。因为aj&gt;=1，前一项不大于该值；由乘积排序关系，后一项也不大于该值。故正序最大值不大于反序最大值，其他大臣前缀积不变，交换安全。重复消逆序即得结论。</p>
+<h3>完整 C++17 实现</h3>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+
+struct node
+{
+    int a,b;
+}a[1005];
+int num[5005],tmp[5005],best[5005];
+int len=1,blen=1;
+bool cmp(node x,node y)
+{
+    return x.a*x.b&lt;y.a*y.b;
+}
+void mul(int x)
+{
+    int carry=0;
+    for(int i=1;i&lt;=len;i++)
+    {
+        int v=num[i]*x+carry;
+        num[i]=v%10;
+        carry=v/10;
+    }
+    while(carry)
+    {
+        num[++len]=carry%10;
+        carry/=10;
+    }
+}
+void check(int x)
+{
+    int rem=0;
+    for(int i=len;i&gt;=1;i--)
+    {
+        rem=rem*10+num[i];
+        tmp[i]=rem/x;
+        rem%=x;
+    }
+    int tlen=len;
+    while(tlen&gt;1&amp;&amp;tmp[tlen]==0) tlen--;
+    bool larger=tlen&gt;blen;
+    if(tlen==blen)
+    {
+        for(int i=tlen;i&gt;=1;i--)
+        {
+            if(tmp[i]!=best[i])
+            {
+                larger=tmp[i]&gt;best[i];
+                break;
+            }
+        }
+    }
+    if(larger)
+    {
+        blen=tlen;
+        for(int i=1;i&lt;=blen;i++) best[i]=tmp[i];
+    }
+}
+signed main()
+{
+    int n,king,right;
+    cin&gt;&gt;n&gt;&gt;king&gt;&gt;right;
+    for(int i=1;i&lt;=n;i++) cin&gt;&gt;a[i].a&gt;&gt;a[i].b;
+    sort(a+1,a+n+1,cmp);
+    num[1]=1;
+    mul(king);
+    for(int i=1;i&lt;=n;i++)
+    {
+        check(a[i].b);
+        mul(a[i].a);
+    }
+    for(int i=blen;i&gt;=1;i--) cout&lt;&lt;best[i];
+    cout&lt;&lt;'\n';
+    return 0;
+}
+</code></pre>
+<h3>作用、使用场景与易错点</h3>
+<p>排序交换与高精度组合。num倒序存十进制数字，mul为高精度乘小整数，check从高位长除法得到商并按长度/高位比较最大值。国王始终最前面，他的右手不影响答案；先乘再除会错。最多1001个小于10000的因子，不超过4004位，5005位安全。时间O(n log n+nD)，空间O(n+D)。不能因为#define int long long就省掉高精度。</p>
+<p><a id="c31"></a></p>
+<h2>P1012 拼数</h2>
+<p><a href="https://www.luogu.com.cn/problem/P1012">洛谷原题</a></p>
+<h3>概念与策略</h3>
+<p>比较两个字符串x+y和y+x，较大的排列方式排前面，不能按原数值大小排序。</p>
+<h3>原理与正确性</h3>
+<p>相邻交换只改变拼接中这两个块；前后内容相同，两种局部拼接长度也相同，因此x+y较大时放x在前不会变差。比较器等价于比较无限周期串的顺序（或x/(10^len(x)-1)），所以具有一致性，能够用于sort；相等时返回false。</p>
+<h3>完整 C++17 实现</h3>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+
+string a[25];
+bool cmp(string x,string y)
+{
+    return x+y&gt;y+x;
+}
+signed main()
+{
+    int n;
+    cin&gt;&gt;n;
+    for(int i=1;i&lt;=n;i++) cin&gt;&gt;a[i];
+    sort(a+1,a+n+1,cmp);
+    for(int i=1;i&lt;=n;i++) cout&lt;&lt;a[i];
+    cout&lt;&lt;'\n';
+    return 0;
+}
+</code></pre>
+<h3>作用、使用场景与易错点</h3>
+<p>适用于把完整数字块排列成最大拼接数。例9与34：934&gt;349，所以9在前；12与121：12121&gt;12112，所以12在前。结果用字符串输出，不做整数转换。若单块最大长度L，时间O(n log n×L)，存储O(nL)。</p>
+<p><a id="c32"></a></p>
+<h2>自测与复习</h2>
+<ol>
+<li>为什么按价值密度选不能直接解0/1背包？写出容量50的反例。</li>
+<li>对时间8、2、5，用相邻交换公式说明升序为何安全。</li>
+<li>选择[0,1)和[1,2)时，代码应使用 &gt;= 还是 &gt;？答案 &gt;=。</li>
+<li>为什么合并后的新节点必须重新入堆？它可能比原来的第三小还小。</li>
+<li>根深度是0还是1？按边数计为0。</li>
+<li>符号越常见是否通常应更靠近根？是；更短码字减少总位数。</li>
+<li>能否只凭“每次取最小”就声称正确？不能；要证明交换安全和剩余子问题同型。</li>
+</ol>
+<p>建议先完成K01..K06与前三题，再学堆和哈夫曼；最后尝试遮住证明，自己重写交换和归纳论证。学习记录中的通过状态由你实际刷题后填写。</p>
+<p><a id="c33"></a></p>
+<h2>来源与适用范围</h2>
+<p>章节结构来自用户图片，讲解和教学程序为本次编写。四个洛谷原题链接已于2026-11-08核对；题意为概括，提交前阅读原页。分卷子与编码制定缺少原题信息，已明确区分教学模型。参考贪心与前缀编码原理可查 <a href="https://ocw.mit.edu/courses/6-046j-design-and-analysis-of-algorithms-spring-2015/pages/lecture-notes/">MIT算法课程</a>。本地验证不等于洛谷在线评测通过。</p></article><footer>2026-11-08 · 离线学习资料 · 本地测试不代表在线评测通过。</footer></main><script>
+const $=id=>document.getElementById(id);let frames=[],step=0,timer=null;
+function add(text,data,kind='cells'){frames.push({text,data:structuredClone(data),kind});}
+function cell(label,value){return {label,value};}
+function build(name){frames=[];
+
+if(name==='candy'){let a=[4,2,3],x=3,ans=0;add('初始相邻糖果可能超过3。',a.map((v,i)=>cell('盒'+(i+1),v)));ans+=a[0]-x;a[0]=x;add('先把首盒压到3；已删1。',a.map((v,i)=>cell('盒'+(i+1),v)));for(let i=1;i<a.length;i++){let d=Math.max(0,a[i-1]+a[i]-x);a[i]-=d;ans+=d;add('处理第'+(i+1)+'盒：删右盒'+d+'颗；共删'+ans+'。',a.map((v,i)=>cell('盒'+(i+1),v)));}}
+if(name==='delete'){let a='178543',k=4;add('从178543中删4位，保持剩余顺序。',[cell('当前',a)]);while(k--){let i=0;while(i+1<a.length&&a[i]<=a[i+1])i++;let removed=a[i];a=a.slice(0,i)+a.slice(i+1);add('删除首个下降处的'+removed+'；若没有下降就删末位。',[cell('当前',a)]);}}
+if(name==='cheap'){let budget=8,ans=0;add('相同收益的可达苹果，成本排序为1、2、3、5。',[cell('力气',budget)]);for(let c of [1,2,3,5]){if(c>budget){add('成本5已超过剩余力气，后面更贵的也不选。',[cell('已摘',ans),cell('剩余力气',budget)]);break;}budget-=c;ans++;add('摘成本'+c+'的苹果。',[cell('已摘',ans),cell('剩余力气',budget)]);}add('牛奶也按单价升序，但每家可买多单位，按需求截断；详见正文。',[cell('共同点','优先低成本')]);}
+if(name==='road'){let a=[2,3,1,2],last=0,ans=0;add('道路深度2、3、1、2；新增高度才需要新开水平施工段。',a.map((v,i)=>cell('位置'+(i+1),v)));for(let x of a){let d=Math.max(0,x-last);ans+=d;add('当前深度'+x+'，左邻'+last+'，新增'+d+'层。',[cell('本步贡献',d),cell('累计天数',ans)]);last=x;}}
+if(name==='pair'){let a=[5,8,12,18],l=0,r=3,ans=0;add('每组最多两件，上限20。',a.map(v=>cell('物品',v)));while(l<=r){let text;if(l<r&&a[l]+a[r]<=20){text='配对'+a[l]+'与'+a[r];l++;}else text=a[r]+'单独成组';r--;ans++;add(text,[cell('已分组',ans),cell('剩余',a.slice(l,r+1).join(',')||'无')]);}}
+if(name==='jump'){let a=[1,2,3],l=0,r=2,now=0,ans=0,high=true;add('从地面0开始，下一步先跳最高。',[cell('当前位置',0)]);while(l<=r){let x=high?a[r--]:a[l++],cost=(x-now)**2;ans+=cost;add(now+'→'+x+'，平方差'+cost,[cell('本步体力',cost),cell('累计体力',ans)]);now=x;high=!high;}}
+if(name==='teams'){let groups=[];for(let x of [1,2,2,3]){let candidates=groups.filter(g=>g[g.length-1]===x-1).sort((a,b)=>a.length-b.length);if(candidates.length)candidates[0].push(x);else groups.push([x]);add('处理实力'+x+'，优先接上以'+(x-1)+'结尾的最短组。',groups.map((g,i)=>cell('组'+(i+1),g.join(','))));}}
+if(name==='king'){let a=[[2,3],[3,4],[4,2]].sort((x,y)=>x[0]*x[1]-y[0]*y[1]),product=2,ans=0;add('国王左手2，大臣按左右手乘积升序。',a.map(x=>cell('('+x.join(',')+')',x[0]*x[1])));for(let [left,right] of a){let reward=Math.floor(product/right);ans=Math.max(ans,reward);add('先算floor('+product+'/'+right+')='+reward+'，再把前缀积乘'+left+'。',[cell('当前最高奖赏',ans),cell('更新后前缀积',product*left)]);product*=left;}}
+if(name==='concat'){let a=['9','34','12','121'];add('比较两个块的拼接，不是按整数大小。',a.map(v=>cell('数字块',v)));add('12+121=12121，121+12=12112，所以12在121前。',[cell('较大拼接','12121')]);a.sort((x,y)=>(x+y>y+x?-1:x+y<y+x?1:0));add('按拼接比较排序，直接输出字符串。',[cell('结果',a.join(''))]);}
+
+if(name==='bag'){let left=50,ans=0;let a=[[10,60],[20,100],[30,120]];add('容量50，单位价值依次6、5、4，按降序选。',a.map((x,i)=>cell('物品'+(i+1),x[0]+'重/'+x[1]+'值')));for(let i=0;i<a.length;i++){let w=Math.min(left,a[i][0]);left-=w;ans+=w*a[i][1]/a[i][0];add('取第'+(i+1)+'件 '+w+' 重；价值增加'+w*a[i][1]/a[i][0]+'。',[cell('剩余容量',left),cell('累计价值',ans)]);}}
+if(name==='counter'){add('同样的物品，改为不可分割，密度贪心不再安全。',[cell('容量',50),cell('三件重量','10,20,30')]);add('密度优先取前两件，总重30，第三件放不下。',[cell('贪心价值',160),cell('闲置容量',20)]);add('真正最优是取后两件，总重50，价值220。',[cell('最优价值',220),cell('差距',60)]);}
+if(name==='queue'){let a=[{id:1,t:3},{id:2,t:1},{id:3,t:2}];function show(t){let now=0,total=0;let cells=a.map(x=>{let c=cell('编号'+x.id+' 接水'+x.t,'等待'+now);total+=now;now+=x.t;return c});add(t+'；总等待'+total,cells);}show('原顺序');[a[0],a[1]]=[a[1],a[0]];show('交换相邻逆序3与1，后面开始时间不变');[a[1],a[2]]=[a[2],a[1]];show('再交换3与2，得到升序；平均等待4/3≈1.33');}
+if(name==='interval'){let a=[[1,2],[0,3],[2,4],[4,5]],last=-1,chosen=[];add('按结束时间排序，横轴为时间0..5；蓝色为当前候选，绿色为已选。',{a,chosen,cur:-1},'interval');for(let i=0;i<a.length;i++){let ok=a[i][0]>=last;if(ok){chosen.push(i);last=a[i][1];}add((ok?'选择':'跳过')+'区间['+a[i].join(',')+')；已选'+chosen.length+'个。',{a,chosen,cur:i},'interval');}}
+if(['merge','split','code'].includes(name)){let roots=[{w:1,id:'A'},{w:2,id:'B'},{w:9,id:'C'}],cost=0;add('初始三个叶权1、2、9。',{roots,cost},'tree');while(roots.length>1){roots.sort((a,b)=>a.w-b.w);let x=roots.shift(),y=roots.shift(),n={w:x.w+y.w,left:x,right:y};cost+=n.w;roots.push(n);add('合并最小两项'+x.w+'和'+y.w+'，累计代价'+cost+'。',{roots,cost},'tree');}if(name==='code')add('左边记0、右边记1：A=00，B=01，C=1；WPL=15。',{roots,cost},'tree');if(name==='split'){frames.reverse();frames[0].text='逆向观察分卷子教学模型：整叠12先拆为3和9；本步花12。';frames[1].text='再把3拆为1和2；本步花3，总拆分代价15。';frames[2].text='得到1、2、9三叠，教学目标完成。树与合并模型互为逆过程。';}}
+step=0;render();}
+function node(n,path=''){let e=document.createElement('div');e.className='branch';let v=document.createElement('div');v.className='node';v.textContent=n.w+(n.id?' '+n.id+' '+path:'');e.append(v);if(n.left){let c=document.createElement('div');c.className='children';c.append(node(n.left,path+'0'),node(n.right,path+'1'));e.append(c);}return e;}
+function render(){let f=frames[step],e=document.createElement('div');if(f.kind==='tree'){e.className='tree';f.data.roots.forEach(n=>e.append(node(n)));}else if(f.kind==='interval'){let ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 600 235');svg.setAttribute('aria-label','区间选择时间轴');for(let i=0;i<=5;i++){let t=document.createElementNS(ns,'text');t.setAttribute('x',40+i*100);t.setAttribute('y',20);t.textContent=i;svg.append(t);}f.data.a.forEach((a,i)=>{let r=document.createElementNS(ns,'rect');r.setAttribute('x',40+a[0]*100);r.setAttribute('y',45+i*45);r.setAttribute('width',(a[1]-a[0])*100);r.setAttribute('height',25);r.setAttribute('fill',f.data.chosen.includes(i)?'#9fce9b':i===f.data.cur?'#eebc73':'#a9c9ef');svg.append(r);let t=document.createElementNS(ns,'text');t.setAttribute('x',45+a[0]*100);t.setAttribute('y',63+i*45);t.textContent='['+a.join(',')+')'+(f.data.chosen.includes(i)?' 已选':'');svg.append(t);});e.append(svg);}else{e.className='cells';f.data.forEach(c=>{let d=document.createElement('div');d.className='cell';let l=document.createElement('small'),v=document.createElement('b');l.textContent=c.label;v.textContent=c.value;d.append(l,v);e.append(d);});}$('stage').replaceChildren(e);$('stage').setAttribute('aria-label',f.text);$('caption').textContent=f.text;$('counter').textContent=(step+1)+' / '+frames.length;$('prev').disabled=step===0;$('next').disabled=step===frames.length-1;}
+function stop(){clearInterval(timer);timer=null;$('play').textContent='自动播放';}
+$('scene').onchange=()=>{stop();build($('scene').value);};$('prev').onclick=()=>{stop();step--;render();};$('next').onclick=()=>{stop();step++;render();};$('reset').onclick=()=>{stop();step=0;render();};$('play').onclick=()=>{if(timer){stop();return;}if(step===frames.length-1)step=0;render();$('play').textContent='暂停';timer=setInterval(()=>{if(step===frames.length-1){stop();return;}step++;render();},1200);};build('bag');
+</script></body></html>
