@@ -1,0 +1,562 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第三章 · 二分查找与二分答案</title><link rel="stylesheet" href="../阅读主题.css"></head><body><header><small>ALGORITHM NOTES</small><h1>03 / 二分查找与二分答案</h1></header><main><nav></nav><details class="lab-wrap" open><summary>交互实验室 · 先手算，再前进一步</summary><section class="lab"><p>蓝色表示当前探测位置，灰色表示已排除；L、R是候选边界，不一定是数组内的元素。</p><div class="controls"><label for="scene">演示</label><select id="scene"><option value="search">查找第一次出现</option><option value="bounds">lower / upper边界</option><option value="wood">砍树：最大可行值</option><option value="cows">奶牛：检验距离</option><option value="real">实数区间夹逼</option><option value="missing">查不到与尾后位置</option></select><button id="prev">上一步</button><button id="next">下一步</button><button id="play">自动播放</button><button id="reset">重置</button><span id="counter"></span></div><div class="stage" id="stage" role="img" aria-label="二分状态"></div><div class="caption" id="caption" aria-live="polite"></div></section></details><article><p><a id="c0"></a></p>
+<h1>第三章：二分查找与二分答案</h1>
+<!--TOC-->
+<h2 id="book-toc">目录</h2>
+<ul>
+<li><a href="#c1">阅读路线与知识地图</a></li>
+<li><a href="#c2">01 二分查找：把书一半一半地排除</a></li>
+<li><a href="#c3">02 边界与不变量：给左右手规定清楚职责</a></li>
+<li><a href="#c4">03 lower_bound 与 upper_bound：给同一个值拍集体照</a></li>
+<li><a href="#c5">04 A-B数对：固定一个人，统计他的搭档</a></li>
+<li><a href="#c6">05 二分答案：先问“这个数能不能做到”</a></li>
+<li><a href="#c7">06 check怎么写：把复杂目标拆成一次扫描</a></li>
+<li><a href="#c8">07 实数二分：在异号端点中间越夹越紧</a></li>
+<li><a href="#c9">08 五道例题与完整程序</a></li>
+<li><a href="#c10">09 写完代码前的边界清单</a></li>
+<li><a href="#c11">10 复习与延伸</a></li>
+<li><a href="#c12">参考与编写说明</a></li>
+</ul>
+<!--/TOC-->
+
+<blockquote>
+<p>本章主线：不是背住几行循环，而是始终知道“答案还可能在哪里”。</p>
+</blockquote>
+<p>先学会在一排数里找边界，再学会在一排“可行/不可行”里找边界。你会发现，查数字、砍树、安排奶牛，问的是同一件事：分界点在哪儿。</p>
+<p><a id="c1"></a></p>
+<h2>阅读路线与知识地图</h2>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>图片中的知识点</th>
+<th>这一节要解决的问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>先找一个数</td>
+<td>二分查找思想、实现</td>
+<td>一次排除一半，为什么不会漏答案？</td>
+</tr>
+<tr>
+<td>找到正确边界</td>
+<td>边界问题、lower_bound、upper_bound</td>
+<td>重复值出现很多次，究竟返回哪一个？</td>
+</tr>
+<tr>
+<td>换成找一个答案</td>
+<td>二分答案、单调性判断</td>
+<td>不知道答案，能否先判断猜测值可不可行？</td>
+</tr>
+<tr>
+<td>写可靠的check</td>
+<td>砍树、进击的奶牛、验证可行性</td>
+<td>怎么把目标值变成一次扫描？</td>
+</tr>
+<tr>
+<td>走到实数轴</td>
+<td>一元三次方程、实数二分</td>
+<td>不能用整数的+1/-1时，怎样缩小范围？</td>
+</tr>
+</tbody>
+</table>
+<p>推荐顺序：第1—4节 → P2249/P1102 → 第5—6节 → P1873/P1824 → 第7节 → P1024。每节都有直觉、原理、实现与适用场景；代码统一为你的风格。</p>
+<p><a id="c2"></a></p>
+<h2>01 二分查找：把书一半一半地排除</h2>
+<h3>先从一个能想象的场景开始</h3>
+<p>你在一本按字母排序的通讯录里找名字，会从第一页逐个看吗？通常会翻到中间：若目标在当前名字后面，前半本都不用看了。二分就是把这个动作变成程序。</p>
+<p>用数组 <code>[1,3,3,3,7,9]</code> 查3。我们想要的是<strong>第一次出现</strong>，所以在中间看见3时，不能马上满足：左边可能还有3。</p>
+<pre><code class="language-text">下标       1   2   3   4   5   6    7
+数值       1   3   3   3   7   9   哨兵位置
+&gt;=3？      否  是  是  是  是  是    是（逻辑约定）
+               ↑ 要找第一个“是”
+</code></pre>
+<p>哨兵位置只是“没找到合格元素”的返回位置，不是真的给数组填了一个值。</p>
+<h3>概念与原理</h3>
+<p>二分通过一次比较排除一整段候选。它依赖的不是“数组”这个容器，而是顺序带来的推理：中间的数都小于3，前面的更不可能够大；中间已经&gt;=3，后面也都&gt;=3，但最靠左的答案可能还在左侧。</p>
+<p>每次候选长度大约减半。100万项最多约20次判断就能压到一个位置。时间O(log n)，额外空间O(1)；若每次二分前都重新排序，会把准备工作的代价漏算。</p>
+<h3>C++ 实现与逐步手推</h3>
+<p>本章的查找统一用下标1..n，初始l=1、r=n+1。目标是返回第一个&gt;=x的位置，允许返回n+1。</p>
+<pre><code class="language-cpp">int first_ge(int n,int x)
+{
+    int l=1,r=n+1;
+    while(l&lt;r)
+    {
+        int mid=l+(r-l)/2;
+        if(a[mid]&gt;=x) r=mid;
+        else l=mid+1;
+    }
+    return l;
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>轮次</th>
+<th style="text-align: right;">l</th>
+<th style="text-align: right;">r</th>
+<th style="text-align: right;">mid</th>
+<th>看见什么</th>
+<th>下一步</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">4</td>
+<td>a[4]=3，已经够大</td>
+<td>r=4，仍保留它</td>
+</tr>
+<tr>
+<td>2</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">2</td>
+<td>a[2]=3，已经够大</td>
+<td>r=2</td>
+</tr>
+<tr>
+<td>3</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">1</td>
+<td>a[1]=1，不够大</td>
+<td>l=2，排除它</td>
+</tr>
+<tr>
+<td>结束</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">—</td>
+<td>候选只剩位置2</td>
+<td>返回2</td>
+</tr>
+</tbody>
+</table>
+<h3>作用与使用场景</h3>
+<p>适合已排序数组的多次查找、插入位置、重复值边界。若原数组无序，要先判断能否排序：P2249要求原编号且输入本就有序，不能随意打乱原顺序。核心不是“找到了一个3”，而是“找到了最左边的合格位置”。</p>
+<p><a id="c3"></a></p>
+<h2>02 边界与不变量：给左右手规定清楚职责</h2>
+<h3>概念：答案位置不是目标值</h3>
+<p>查4时，first_ge返回5，因为a[5]=7是第一个&gt;=4的数；但数组里根本没有4。<strong>找到插入位置不等于找到相等元素。</strong> 查询精确值还要检查位置合法且a[pos]==x。</p>
+<h3>原理：每一轮都要保住答案</h3>
+<p>设p是第一个&gt;=x的位置，不存在就令p=n+1。始终保持p在闭区间[l,r]里：</p>
+<ul>
+<li>a[mid]&gt;=x：p&lt;=mid，因此r=mid，不能写mid-1把潜在答案删掉。</li>
+<li>a[mid]&lt;x：mid以及它左边都不合格，因此l=mid+1。</li>
+</ul>
+<p>每轮l&lt;r，向下取整保证mid&lt;r，所以mid最多为n，不会读取a[n+1]。当两手碰面时，p就无处可藏了。</p>
+<pre><code class="language-text">只剩两个候选：[l] [r]
+mid取左边l
+如果a[mid]不够：l=mid+1，确实向右走
+如果够了：r=mid，确实向左收
+两种情况都会缩短，才不会原地打转
+</code></pre>
+<h3>实现：先检查下标，再读数组</h3>
+<pre><code class="language-cpp">int pos=first_ge(n,x);
+if(pos&lt;=n&amp;&amp;a[pos]==x) cout&lt;&lt;pos;
+else cout&lt;&lt;-1;
+</code></pre>
+<p>&amp;&amp;从左到右短路：位置超出就不读数组。若把两项倒过来，就可能先越界。<code>mid=l+(r-l)/2</code>在本章非负下标范围也避免了l+r直接相加的风险。</p>
+<h3>使用场景与易错点</h3>
+<p>全小于x时返回n+1，全大于x时返回1，n=1也应能结束。初始化、循环条件、中点取法、更新规则是一整套约定，不要从不同模板各抄一句。初学时先固定这套，理解后再比较其他区间写法。</p>
+<p><a id="c4"></a></p>
+<h2>03 lower_bound 与 upper_bound：给同一个值拍集体照</h2>
+<h3>概念与直觉</h3>
+<p>数组 <code>[1,3,3,3,7,9]</code> 中三个3站成一排。lower_bound站到这排人的左边，upper_bound站到这排人的右边：</p>
+<pre><code class="language-text">1 | 3  3  3 | 7  9
+    ↑         ↑
+    lower(3)  upper(3)
+位置2         位置5
+人数=5-2=3
+</code></pre>
+<p>lower_bound找第一个&gt;=x；upper_bound找第一个&gt;x。名字别按“上界=最后一个相等”硬翻：upper指向的是最后一个相等元素的<strong>后一个位置</strong>。</p>
+<h3>原理与实现</h3>
+<p>对有序升序数组，它们分别找两条单调判断线的第一个真：a[i]&gt;=x，与a[i]&gt;x。</p>
+<pre><code class="language-cpp">int l=lower_bound(a+1,a+n+1,x)-a;
+int r=upper_bound(a+1,a+n+1,x)-a;
+int cnt=r-l;
+</code></pre>
+<p>a+1指第一个参与查找的元素，a+n+1是尾后位置、不参与查找；返回的是指针，减a才转成从1开始的下标。查4时两个位置都是5，数量为0。查10时两个位置都是n+1，仍然数量为0，不必访问那个位置。</p>
+<h3>作用与使用场景</h3>
+<p>统计重复值、求第一个&gt;=x、最后一个&lt;=x（upper位置减1）和区间计数。数组上每次O(log n)。输入必须符合相应的有序/划分条件；本章直接要求先升序排列。尾后指针可以做减法，不能拿来解引用。</p>
+<p><a id="c5"></a></p>
+<h2>04 A-B数对：固定一个人，统计他的搭档</h2>
+<h3>概念与策略</h3>
+<p>不必同时猜A、B。固定当前位置的B，则A必须等于B+C。对每个B，找目标值出现了多少次，加起来即可。</p>
+<p>例如 <code>[1,1,2,2,2]</code>，C=1。两个位置上的1，各能与三个位置上的2配对，所以共有2×3=6对。值相等但位置不同，题目仍算不同数对。</p>
+<h3>为什么不会重算</h3>
+<p>每一对都有唯一的B所在位置，循环恰好处理它一次。C是正数，所以A与B不可能来自同一个位置，不需要额外减去自己。如果把题目改成C=0，计数定义和自配对问题必须另行分析，不能照抄结论。</p>
+<h3>实现、复杂度与用途</h3>
+<p>完整程序P1102见后文，核心是对每个a[i]+C调用两次边界查询。排序O(n log n)，n次查询O(n log n)，空间O(n)。答案可能达到约10^10，要用64位；你的int宏已经提供64位，但仍应知道为什么需要它。这是“固定一维，把另一维交给查找”的常见降复杂度方法。</p>
+<p><a id="c6"></a></p>
+<h2>05 二分答案：先问“这个数能不能做到”</h2>
+<h3>概念：从问答题换成判断题</h3>
+<p>直接问“锯子最高能设多少”很难；换成“设为15米，木材够不够”就只需算一遍。二分答案先猜目标值，再用check判断，利用真假分界缩小范围。</p>
+<pre><code class="language-text">候选高度    0  1  2 ... 15 | 16 ... 20
+木材够吗    是 是 是 ... 是 | 否 ... 否
+                         ↑ 最大可行值
+</code></pre>
+<p>不是看到“最大”“最小”就能二分，必须证明真假只变一次。像“是否恰好砍到7单位”可能不是一条前真后假的线；本题问至少需要多少，因此可以。</p>
+<h3>原理：单调的是可行性</h3>
+<p>若高度h能取得足够木材，再降低锯子只会取得更多，仍可行。这证明check(h)从真到假。原数据的树高可以无序，二分的是高度的数轴，根本不要求先排序树高。</p>
+<h3>实现：最大可行值统一使用ans记录法</h3>
+<pre><code class="language-cpp">int l=L,r=R,ans=-1;
+while(l&lt;=r)
+{
+    int mid=l+(r-l)/2;
+    if(check(mid))
+    {
+        ans=mid;
+        l=mid+1;
+    }
+    else r=mid-1;
+}
+</code></pre>
+<p>mid可行就把它记入ans，再大胆去右侧找更大的；不可行就往左缩。这里已经把mid保存了，更新可以排除它。与first_ge保留mid的模板不同，不要混用。ans=-1表示没有发现任何可行值；若题目保证有解，它最终会被更新。</p>
+<h3>使用场景与复杂度</h3>
+<p>“最大化最小距离”“最小化最大负载”“满足需求的最大高度”经常出现，但都要先画真假线。若一次check要O(n)，总复杂度是O(n log V)，不是O(log V)；V为候选范围大小。</p>
+<p><a id="c7"></a></p>
+<h2>06 check怎么写：把复杂目标拆成一次扫描</h2>
+<h3>砍树：直接累计就够了</h3>
+<p>树高20、15、10、17，需求7。设h=15，每棵贡献5、0、0、2，共7，恰好够；h=16贡献4、0、0、1，共5，不够，所以最佳高度在15这条分界处。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">猜的高度</th>
+<th>四棵树的贡献</th>
+<th style="text-align: right;">总木材</th>
+<th>可行性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">10</td>
+<td>10、5、0、7</td>
+<td style="text-align: right;">22</td>
+<td>真</td>
+</tr>
+<tr>
+<td style="text-align: right;">15</td>
+<td>5、0、0、2</td>
+<td style="text-align: right;">7</td>
+<td>真</td>
+</tr>
+<tr>
+<td style="text-align: right;">16</td>
+<td>4、0、0、1</td>
+<td style="text-align: right;">5</td>
+<td>假</td>
+</tr>
+</tbody>
+</table>
+<p>实现就是累加max(0,a[i]-h)。达到需求后可以提前返回true，因为后面只会继续增加。总木材比单棵树高大很多，要用64位。木材判断与二分移动方向分开写，排错时先单独核对check。</p>
+<h3>奶牛：贪心负责判断，二分负责找边界</h3>
+<p>牛舍位置1、2、4、8、9，放3头牛。猜最近距离d=3：先放1，再放4，再放8，成功。猜d=4：先放1，下一个最早能放8，之后没有第三间合格牛舍，失败。</p>
+<pre><code class="language-text">d=3：1(牛)  2  4(牛)       8(牛) 9
+d=4：1(牛)  2  4           8(牛) 9   放不够
+</code></pre>
+<p>为什么每次放在最早满足距离的位置？把某个方案里的当前牛向左挪到这个位置，不会影响前面的距离约束，也只会给后面的牛留出更多空间。逐头交换，贪心可以放下的数量不少于任意方案。因此check的贪心判定本身也有正确性依据。</p>
+<p>如果距离d能放下m头，要求更小距离时当然还能放下，所以仍是真→假，找最大真。check里比较的是“当前牛舍与上一头已放奶牛的距离”，不是与数组上一项的距离。</p>
+<h3>实现与适用场景</h3>
+<p>完整check分别在P1873和P1824程序中，前者直接求和，后者先排序再贪心。奶牛排序O(n log n)，二分部分O(n log V)，空间O(n)。这里的m至少为2且不超过n；若改成单牛，最小两牛距离没有同样含义，需要重新定义。</p>
+<p><a id="c8"></a></p>
+<h2>07 实数二分：在异号端点中间越夹越紧</h2>
+<h3>概念：没有“下一个实数”</h3>
+<p>整数候选可以+1跳过已检查位置，实数却没有紧邻的下一个值。对一个已经夹住根的连续函数区间，我们每次取中点，再保留仍然异号的半段，像两只手一点点夹住根。</p>
+<pre><code class="language-text">f(l)&lt;0             根             f(r)&gt;0
+   l------------------------------r
+                 mid
+若f(mid)&lt;0：把左手移到mid
+若f(mid)&gt;0：把右手移到mid
+</code></pre>
+<p>这个图里函数朝上穿过轴，但程序不能只写“f(mid)&gt;0就往左”。若函数朝下穿过，符号方向会反过来。正确做法是比较f(mid)与左端f(l)是否同号，同号就替换左端。</p>
+<h3>原理与边界</h3>
+<p>连续函数两端异号，保证内部至少有一个根，这是连续性而不是全局单调性提供的保证。一元三次函数在[-100,100]整体可能有拐弯，也有3个根，不能对全区间只二分一次。</p>
+<p>P1024额外保证三根不同且根距&gt;=1。因此先逐个检查整点根，再扫描每个(i,i+1)；在这种宽度内最多有一个根，端点异号时再局部夹逼。不是所有方程都能这样扫描：偶重根可能两边同号，根距太近也可能一格里挤入多个根。</p>
+<h3>实现与精度</h3>
+<pre><code class="language-cpp">for(int i=1;i&lt;=60;i++)
+{
+    double mid=(l+r)/2;
+    if((f(l)&gt;0)==(f(mid)&gt;0)) l=mid;
+    else r=mid;
+}
+</code></pre>
+<p>这段要求初始端点严格异号、端点根已单独处理；若中点正好为零，后续也会朝这个根收缩。完整程序缓存左端函数值，避免重复计算。单个初始宽度1的区间缩60次，理论宽度为2^-60；实际受double精度限制，足以用于本题两位小数。固定次数比while(l!=r)可靠，因为浮点数通常不会刚好相等，也可能因舍入停止移动。</p>
+<h3>作用与使用场景</h3>
+<p>适合连续函数的局部求根，或实数上的单调可行性边界。先说明连续性/单调性依据，再讨论停止标准。输出两位不代表只迭代两次；内部应保留更高精度，最后再格式化。</p>
+<p><a id="c9"></a></p>
+<h2>08 五道例题与完整程序</h2>
+<p>下面先按例题手算，再对照代码。所有程序使用C++17和你的格式。代码目录只是方便单独编译，平时直接读本手册即可。</p>
+<h3>P2249 有序列中查找元素</h3>
+<p><a href="https://www.luogu.com.cn/problem/P2249">洛谷原题</a></p>
+<p>输入本就单调不减，输出第一次出现的编号。用first_ge找到&gt;=x的最左位置，再判断相等；未命中返回-1。对1、3、3、3、7、9查询3、4、10，答案2、-1、-1。单次O(log n)，总O(n+m log n)，空间O(n)。不需要排序，也不能把找到任意一个3当作正确。</p>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+
+int a[1000005];
+int find_first(int n,int x)
+{
+    int l=1,r=n+1;
+    while(l&lt;r)
+    {
+        int mid=l+(r-l)/2;
+        if(a[mid]&gt;=x) r=mid;
+        else l=mid+1;
+    }
+    if(l&lt;=n&amp;&amp;a[l]==x) return l;
+    return -1;
+}
+signed main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    int n,m;
+    cin&gt;&gt;n&gt;&gt;m;
+    for(int i=1;i&lt;=n;i++) cin&gt;&gt;a[i];
+    for(int i=1;i&lt;=m;i++)
+    {
+        int x;
+        cin&gt;&gt;x;
+        cout&lt;&lt;find_first(n,x)&lt;&lt;(i==m?'\n':' ');
+    }
+    return 0;
+}
+</code></pre>
+<h3>P1102 A-B数对</h3>
+<p><a href="https://www.luogu.com.cn/problem/P1102">洛谷原题</a></p>
+<p>先排序，对每个B查B+C的左右边界。用1、1、2、2、2和C=1，左右边界3与6相减得3，两个B各贡献3，总6。边界返回尾后位置也能相减，不访问它。总O(n log n)，空间O(n)。</p>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+
+int a[200005];
+signed main()
+{
+    int n,c,ans=0;
+    cin&gt;&gt;n&gt;&gt;c;
+    for(int i=1;i&lt;=n;i++) cin&gt;&gt;a[i];
+    sort(a+1,a+n+1);
+    for(int i=1;i&lt;=n;i++)
+    {
+        int x=a[i]+c;
+        int l=lower_bound(a+1,a+n+1,x)-a;
+        int r=upper_bound(a+1,a+n+1,x)-a;
+        ans+=r-l;
+    }
+    cout&lt;&lt;ans&lt;&lt;'\n';
+    return 0;
+}
+</code></pre>
+<h3>P1873 砍树</h3>
+<p><a href="https://www.luogu.com.cn/problem/P1873">洛谷原题</a></p>
+<p>把答案范围设为0..最高树高，找最大可行锯高。20、15、10、17需要7时，mid=10可行→去11..20；mid=15可行→去16..20；mid=18不可行→去16..17；mid=16不可行→结束，ans仍是15。sum统计木材，ans记录已经验证过的候选，二者不能混用。时间O(n log H)，空间O(n)。</p>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+
+int a[1000005],n,m;
+bool check(int h)
+{
+    int sum=0;
+    for(int i=1;i&lt;=n;i++)
+    {
+        if(a[i]&gt;h) sum+=a[i]-h;
+        if(sum&gt;=m) return true;
+    }
+    return sum&gt;=m;
+}
+signed main()
+{
+    cin&gt;&gt;n&gt;&gt;m;
+    int high=0;
+    for(int i=1;i&lt;=n;i++)
+    {
+        cin&gt;&gt;a[i];
+        high=max(high,a[i]);
+    }
+    int l=0,r=high,ans=-1;
+    while(l&lt;=r)
+    {
+        int mid=l+(r-l)/2;
+        if(check(mid))
+        {
+            ans=mid;
+            l=mid+1;
+        }
+        else r=mid-1;
+    }
+    cout&lt;&lt;ans&lt;&lt;'\n';
+    return 0;
+}
+</code></pre>
+<h3>P1824 进击的奶牛</h3>
+<p><a href="https://www.luogu.com.cn/problem/P1824">洛谷原题</a></p>
+<p>先排序牛舍，再二分最小间距。1、2、4、8、9放3头，d=3可行、d=4不可行，答案3。上界取最大位置减最小位置，不是坐标最大值本身。check最后cnt&gt;=m就成功，不要求恰好m，因为能放更多时也能只放其中m头。时间O(n log n+n log V)，空间O(n)。</p>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+
+int a[100005],n,m;
+bool check(int d)
+{
+    int last=a[1],cnt=1;
+    for(int i=2;i&lt;=n;i++)
+    {
+        if(a[i]-last&gt;=d)
+        {
+            last=a[i];
+            cnt++;
+        }
+    }
+    return cnt&gt;=m;
+}
+signed main()
+{
+    cin&gt;&gt;n&gt;&gt;m;
+    for(int i=1;i&lt;=n;i++) cin&gt;&gt;a[i];
+    sort(a+1,a+n+1);
+    int l=0,r=a[n]-a[1],ans=0;
+    while(l&lt;=r)
+    {
+        int mid=l+(r-l)/2;
+        if(check(mid))
+        {
+            ans=mid;
+            l=mid+1;
+        }
+        else r=mid-1;
+    }
+    cout&lt;&lt;ans&lt;&lt;'\n';
+    return 0;
+}
+</code></pre>
+<h3>P1024 一元三次方程求解</h3>
+<p><a href="https://www.luogu.com.cn/problem/P1024">洛谷原题</a></p>
+<p>先处理整点根，再扫描严格异号的小区间，避免边界根被重复计数或漏掉。x³-6x²+11x-6的三根是1、2、3，全部是整点，因此不应只依靠乘积&lt;0去寻找。另一个例子根为-2.5、0.25、3.75，需要在局部区间二分。收集后排序、去重，再输出两位小数。扫描固定200格，每格最多60轮，存储仅少量根。</p>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+
+double a,b,c,d;
+vector&lt;double&gt; roots;
+double f(double x)
+{
+    return ((a*x+b)*x+c)*x+d;
+}
+signed main()
+{
+    cin&gt;&gt;a&gt;&gt;b&gt;&gt;c&gt;&gt;d;
+    // 单独收集整点根，含-100和100。
+    for(int i=-100;i&lt;=100;i++)
+    {
+        if(fabs(f(i))&lt;1e-9) roots.push_back(i);
+    }
+    for(int i=-100;i&lt;100;i++)
+    {
+        double l=i,r=i+1,fl=f(l),fr=f(r);
+        if(fabs(fl)&lt;1e-9||fabs(fr)&lt;1e-9) continue;
+        if((fl&gt;0)==(fr&gt;0)) continue;
+        for(int j=1;j&lt;=60;j++)
+        {
+            double mid=(l+r)/2,fm=f(mid);
+            if((fl&gt;0)==(fm&gt;0))
+            {
+                l=mid;
+                fl=fm;
+            }
+            else r=mid;
+        }
+        roots.push_back((l+r)/2);
+    }
+    sort(roots.begin(),roots.end());
+    vector&lt;double&gt; ans;
+    for(double x:roots)
+    {
+        if(fabs(x)&lt;1e-8) x=0;
+        if(ans.empty()||fabs(x-ans.back())&gt;1e-6) ans.push_back(x);
+    }
+    for(int i=0;i&lt;(int)ans.size();i++)
+        cout&lt;&lt;fixed&lt;&lt;setprecision(2)&lt;&lt;ans[i]&lt;&lt;(i+1==(int)ans.size()?'\n':' ');
+    return 0;
+}
+</code></pre>
+<p><a id="c10"></a></p>
+<h2>09 写完代码前的边界清单</h2>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>先问自己什么</th>
+<th>最小测试</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>重复值</td>
+<td>要任意位置还是第一次？</td>
+<td>[3,3,3]查3→1</td>
+</tr>
+<tr>
+<td>没有目标</td>
+<td>查到的是&gt;=x还是=x？</td>
+<td>[1,3]查2→-1</td>
+</tr>
+<tr>
+<td>全部不合格</td>
+<td>n+1是否只返回、不访问？</td>
+<td>[1,3]查9→-1</td>
+</tr>
+<tr>
+<td>死循环</td>
+<td>两个候选时更新有没有前进？</td>
+<td>l=1、r=2</td>
+</tr>
+<tr>
+<td>砍树</td>
+<td>可行时应保留更高还是更低？</td>
+<td>h=15够、16不够</td>
+</tr>
+<tr>
+<td>奶牛</td>
+<td>last代表哪头牛？</td>
+<td>位置1、2、4，d=3</td>
+</tr>
+<tr>
+<td>实数根</td>
+<td>整点、端点根有没有单独算？</td>
+<td>根-100、0、100</td>
+</tr>
+<tr>
+<td>精度</td>
+<td>内部迭代够不够，是否出现-0.00？</td>
+<td>含根0的多项式</td>
+</tr>
+</tbody>
+</table>
+<p><a id="c11"></a></p>
+<h2>10 复习与延伸</h2>
+<p>先遮住代码，口述“我找的是什么边界”“check的真代表什么”“这一步排除谁”。能回答这三句话，再写循环。</p>
+<p>练习一：手写第一个&gt;x的位置，只把first_ge条件从&gt;=改成&gt;是否足够？答：在同一套区间约定下足够。</p>
+<p>练习二：最后一个&lt;=x的位置如何求？答：upper_bound返回位置减1；可能得到0，仍要判断是否有合法元素。</p>
+<p>练习三：若目标是找最小可行值、真假为假→真，怎么改ans记录法？答：可行时记ans并r=mid-1，不可行时l=mid+1。</p>
+<p>练习四：砍树和奶牛哪个check用了贪心？答：奶牛。砍树只需按固定高度直接统计。</p>
+<p>练习五：f(x)=x²在[-1,1]两端同号，是否没有根？答：有根0；“异号保证有根”不能倒过来读成“同号保证没根”。</p>
+<p><a id="c12"></a></p>
+<h2>参考与编写说明</h2>
+<p>查阅日期2026-11-11。本章参考 <a href="https://www.hello-algo.com/chapter_searching/binary_search/">Hello 算法·二分查找</a> 的图示驱动学习顺序与 <a href="https://oi-wiki.org/basic/binary/">OI Wiki·二分</a> 的专题分层、边界讨论组织。采用固定侧栏、窄正文、清晰小节的文档式布局。正文、代码、例子和交互图解为本次独立编写，没有复制参考网站的原文或插图。</p>
+<p>选用依据：<a href="https://github.com/krahets/hello-algo">Hello 算法仓库</a> 页面可见约132.2k星标及作者收录的专业推荐语；<a href="https://github.com/OI-wiki/OI-wiki">OI Wiki仓库</a> 页面可见约27.1k星标。星标表示社区关注度，不等于所有内容均有独立质量审查。题目规则以五个链接的洛谷原页为准，本地测试不等于在线评测通过。</p></article><footer>2026-11-11 · 离线阅读 / C++17 / 原创讲解与交互示例</footer></main><script>
+const $=id=>document.getElementById(id);let frames=[],step=0,timer=null;
+function add(text,cells){frames.push({text,cells:structuredClone(cells)});}function c(label,value,active=false,excluded=false){return {label,value,active,excluded};}
+function build(name){frames=[];let a=[1,3,3,3,7,9];
+if(['search','missing','bounds'].includes(name)){let x=name==='missing'?10:3;for(let upper of (name==='bounds'?[false,true]:[false])){let l=1,r=7;function view(mid){return [...a.map((v,i)=>c((i+1===l?'L ':'')+(i+1===r?'R ':'')+'位置'+(i+1),v,i+1===mid,i+1<l||i+1>r)),c('尾后位置7','哨兵',l===7)];}add((upper?'upper：找第一个>':'lower：找第一个>=')+x+'；L=1，R=7。',view(0));while(l<r){let mid=l+Math.floor((r-l)/2),ok=upper?a[mid-1]>x:a[mid-1]>=x;add('L='+l+'，R='+r+'，mid='+mid+'，a[mid]='+a[mid-1]+'；'+(ok?'合格，r=mid，继续向左':'不合格，l=mid+1'),view(mid));if(ok)r=mid;else l=mid+1;}add('收敛到位置'+l+(l===7?'，它是尾后位置，不能读取；精确查询应返回-1。':upper?'，右边界与左边界相减得3。':'，再次确认a[pos]==目标，得到第一次出现。'),view(0));}}
+if(name==='wood'){let trees=[20,15,10,17],l=0,r=20,ans=-1;add('需求7，锯高候选0..20；越高木材越少。',trees.map((v,i)=>c('树'+(i+1),v)));while(l<=r){let h=l+Math.floor((r-l)/2),got=trees.map(v=>Math.max(0,v-h)),sum=got.reduce((a,b)=>a+b,0);add('候选['+l+','+r+']，猜h='+h+'，木材='+sum+'；'+(sum>=7?'可行，记录并向更高试':'不可行，缩小右边界'),got.map((v,i)=>c('树'+(i+1)+'贡献',v)));if(sum>=7){ans=h;l=h+1;}else r=h-1;}add('最大可行锯高为'+ans+'。',[c('最终答案',ans,true)]);}
+if(name==='cows'){let positions=[1,2,4,8,9];for(let d of [3,4]){let placed=[1],last=1;add('尝试d='+d+'，先放最左边1。',positions.map(x=>c('位置'+x,x,x===1)));for(let x of positions.slice(1)){let ok=x-last>=d;if(ok){placed.push(x);last=x;}add('位置'+x+'：'+(ok?'能放，更新上一头牛位置':'间距不足，跳过')+'；目前放下'+placed.length+'头。',positions.map(v=>c('位置'+v,placed.includes(v)?'牛':'空',v===x)));}add('d='+d+'，'+(placed.length>=3?'可行':'不可行')+'。要求距离更大不会更容易。',[c('放下数量',placed.length),c('要求数量',3)]);}}
+if(name==='real'){let l=1.2,r=2.8,f=x=>x*x*x-6*x*x+11*x-6;add('在(1,3)内部选[1.2,2.8]夹住根2；只演示其中一个根。',[c('L',l),c('R',r)]);for(let i=1;i<=8;i++){let mid=(l+r)/2,fm=f(mid);add('第'+i+'轮：mid='+mid.toFixed(6)+'；'+(fm===0?'正好命中根，仍可向根收敛':(f(l)>0)===(fm>0)?'与左端同号，移动左端':'与左端异号，移动右端'),[c('L',l.toFixed(6)),c('mid',mid.toFixed(6),true),c('R',r.toFixed(6)),c('f(mid)',fm.toFixed(6))]);if((f(l)>0)===(fm>0))l=mid;else r=mid;}}
+step=0;render();}
+function render(){let f=frames[step],e=document.createElement('div');e.className='cells';f.cells.forEach(v=>{let x=document.createElement('div');x.className='box'+(v.active?' active':'')+(v.excluded?' excluded':'');let label=document.createElement('small'),value=document.createElement('b');label.textContent=v.label;value.textContent=v.value;x.append(label,value);e.append(x);});$('stage').replaceChildren(e);$('stage').setAttribute('aria-label',f.text);$('caption').textContent=f.text;$('counter').textContent=(step+1)+' / '+frames.length;$('prev').disabled=step===0;$('next').disabled=step===frames.length-1;}
+function stop(){clearInterval(timer);timer=null;$('play').textContent='自动播放';}$('prev').onclick=()=>{stop();step--;render();};$('next').onclick=()=>{stop();step++;render();};$('reset').onclick=()=>{stop();step=0;render();};$('scene').onchange=()=>{stop();build($('scene').value);};$('play').onclick=()=>{if(timer){stop();return;}if(step===frames.length-1)step=0;render();$('play').textContent='暂停';timer=setInterval(()=>{if(step===frames.length-1){stop();return;}step++;render();},1200);};build('search');
+</script><script src="../阅读主题.js"></script></body></html>
