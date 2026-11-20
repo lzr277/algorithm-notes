@@ -2,3 +2,5 @@
 nav a[hidden]{display:none}
 
 article [hidden]{display:none}
+
+article img{max-width:100%;height:auto}
